@@ -4,7 +4,7 @@
 <div class="w3-container">
     <h3>Nieuwe toevoeging van type: {{gekozen_type}}</h3>
     {% if error_message %}<div class="w3-panel w3-red"><p>{{ error_message }}</p></div>{% endif %}
-    <form action="{% url 'bestellingenApp:nieuwekeuze' %}" method="post" style="width: 30%;">
+    <form autocomplete="off" action="{% url 'bestellingenApp:nieuwekeuze' %}" method="post" style="width: 30%;">
         {% csrf_token %}
         <fieldset>
             <legend><p>Voor bestelling</p></legend>
@@ -23,7 +23,12 @@
         <input type="hidden" name="huidig_type" id="huidig_type" value="{{ gekozen_type }}"><br>
 
         <label for="product">Product:</label><br>
-        <input type='text' id="product" name="product" required><br>
+        <input list="products" id="product" name="product" required>
+        <datalist id="products">
+        {% for prod in products_list %}
+           <option value="{{prod}}"> 
+        {% endfor %}
+        </datalist><br>
 
         <label for="cat">Categorie:</label><br>
         <input type='text' id="cat" name="cat" required><br>
@@ -34,9 +39,16 @@
 
         <label for="snijden">Snijden:</label><br>
         <input type='text' id="snijden" name="snijden" required><br>
+
     {% elif gekozen_type == 'menu' %}
         <label for="aantal">Aantal:</label><br>
         <input type='number' id="aantal" name="aantal" required><br>
+
+    {% elif gekozen_type == 'gourmet' %}
+        <label for="config">Configuratie:</label><br>
+        
+        <input type='checkbox' id="{{prod}}" name="{{prod}}" required><br>
+
     {% endif %}
         
         <label for="bijz">Bijzonderheden:</label><br>

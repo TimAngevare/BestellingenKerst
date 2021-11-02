@@ -1,56 +1,62 @@
+from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.http import HttpResponse
 
 import datetime
 from random import choice
 
-from .models import Snijdvlees
-
-TYPES = ['snijdvlees', 'menu', 'gourmet','formaat', 'bronvlees']
+from .models import Snijdvlees, Menu, Gourmet, Formaat, BronVlees, Standaard
+from .forms import NieuweBestellingForm
 
 from utils import get_db
 kerst_db = get_db('kerst_db')
 bests = kerst_db['bestellingen']
+
+TYPES = ['snijdvlees', 'menu', 'gourmet','formaat', 'bronvlees']
+prod_list = ['kip', 'ossenhaas', 'hamburger menu']
 
 def index(request):
     return render(request, 'main.html')
 
 def nieuw(request):
     return render(request, 'nieuw.html', {
-        'type_list': TYPES
+        'form': NieuweBestellingForm()
     })
 
 
 def nieuw_bestel(request):
-    try:
-        gekozen_type = request.POST['prod_type']
-    except (KeyError):
+    if request.method == 'POST':
+        form = NieuweBestellingForm(request.POST)
+        if form.is_valid():
+
+            bestelnrlist = []
+            for entry in bests.find():
+                bestelnrlist.append(entry['bestelnr'])
+            bestelnr = choice([i for i in range(1, 4001) if i not in bestelnrlist])
+
+            email = form.cleaned_data['usr_email']
+            gekozen_type = form.cleaned_data['prod_type']
+
+            doc = {
+                "email": email,
+                "bestelnr": bestelnr,
+                "producten": []
+            }
+            bests.insert_one(doc)
+
+            return render(request, 'gekozenNieuw.html', {
+                'gekozen_type': gekozen_type,
+                'type_list': TYPES,
+                'passed_bestelnr': bestelnr,
+                'passed_email': email,
+                'products_list': prod_list
+            })
+        
         return render(request, 'nieuw.html', {
-            'error_message': "Je hebt geen type gekozen.",
-            'type_list': TYPES
+            'form': form
         })
     else:
-
-        bestelnrlist = []
-        for entry in bests.find():
-            bestelnrlist.append(entry['bestelnr'])
-        bestelnr = choice([i for i in range(1, 4001) if i not in bestelnrlist])
-
-        email = request.POST['usr_email']
-
-        doc = {
-            "email": email,
-            "bestelnr": bestelnr,
-            "producten": []
-        }
-        bests.insert_one(doc)
-
-        return render(request, 'gekozenNieuw.html', {
-            'gekozen_type': gekozen_type,
-            'type_list': TYPES,
-            'passed_bestelnr': bestelnr,
-            'passed_email': email
-        })
+        return HttpResponse("Wejow gek dit kan niet zomaar he.")
 
 def nieuw_entry(request, bestelnr, email):
     try:
@@ -58,25 +64,25 @@ def nieuw_entry(request, bestelnr, email):
     except (KeyError):
         return render(request, 'gekozenNieuw.html', {
             'error_message': "Je hebt geen type gekozen.",
-            'gekozen_type': 'snijdbaar',
+            'gekozen_type': 'snijdvlees',
             'type_list': TYPES,
             'passed_bestelnr': bestelnr,
-            'passed_email': email
+            'passed_email': email,
+            'products_list': prod_list
         })
     else:
         return render(request, 'gekozenNieuw.html', {
             'gekozen_type': gekozen_type,
             'type_list': TYPES,
             'passed_bestelnr': bestelnr,
-            'passed_email': email
+            'passed_email': email,
+            'products_list': prod_list
         })
 
 def bestel_done(request):
     bests.update_one({'bestelnr': int(request.POST['bestelnr'])},{"$set": {"email" : request.POST['usr_email'], "naam" : request.POST['naam'], "telnr" : request.POST['telnr'], "dagophalen" : request.POST['dagophalen'], "besteltijd" : datetime.datetime.utcnow()}})
 
-    return render(request, 'nieuw.html', {
-        'type_list': TYPES
-    })
+    return HttpResponseRedirect('nieuw')
 
 def bestel_pre_finish(request, bestelnr, email):
     
@@ -86,15 +92,23 @@ def bestel_pre_finish(request, bestelnr, email):
     })
 
 def nieuw_keuze(request):
-    bestelnr = int(request.POST.get('bestelnr', '00000'))
-    email = request.POST.get('usr_email', 'kkzooihetisfoutgegaan')
+    bestelnr = request.POST['bestelnr']
+    email = request.POST['usr_email']
 
-    #oude_type = request.POST['huidig_type']
-    #if oude_type == 'snijdbaar':
-    bestelling = Snijdvlees(request.POST['product'], request.POST['cat'], int(request.POST['gewicht']), request.POST['snijden'], request.POST['bijz'])
+    oude_type = request.POST['huidig_type']
+    if oude_type == 'snijdvlees':
+        Snijdvlees(request.POST['product'], request.POST['cat'], int(request.POST['gewicht']), request.POST['snijden'], request.POST['bijz']).insert(int(bestelnr))
+    elif oude_type == 'menu':
+        Menu(request.POST['product'], request.POST['cat'], int(request.POST['aantal']), request.POST['voorgerecht'], request.POST['hoofdgerecht'], request.POST['dessert'], request.POST['bijz']).insert(int(bestelnr))
+    elif oude_type == 'gourmet':
+        Gourmet(request.POST['product'], request.POST['cat'], request.POST['conf']).insert(int(bestelnr))
+    elif oude_type == 'formaat':
+        Formaat(request.POST['product'], request.POST['cat'], request.POST['formaat']).insert(int(bestelnr))
+    elif oude_type == 'bron':
+        BronVlees(request.POST['product'], request.POST['cat'], request.POST['bron'], request.POST['aantal']).insert(int(bestelnr))
+    elif oude_type == 'standaard':
+        Standaard(request.POST['product'], request.POST['cat'], request.POST['aantal']).insert(int(bestelnr))
     
-    bestelling.insert(int(bestelnr))
-
     if request.POST['done'] == 'Klaar':
         return(bestel_pre_finish(request, bestelnr, email))
     else:

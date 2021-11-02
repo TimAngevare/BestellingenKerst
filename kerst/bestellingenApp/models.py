@@ -52,3 +52,75 @@ class Menu:
             new_doc['bijz'] = self.bijz
 
         bests.update_one({'bestelnr': bestelnr}, {"$push" : {"producten" : new_doc}})
+
+class Gourmet:
+    def __init__(self, product, cat, conf):
+        self.product = product
+        self.cat = cat
+        self.conf = conf
+    
+    def insert(self, bestelnr):
+        new_doc = {
+            'product': self.product,
+            'cat': self.cat,
+            'conf': self.conf,
+        }
+
+        if self.bijz:
+            new_doc['bijz'] = self.bijz
+
+        bests.update_one({'bestelnr': bestelnr}, {"$push" : {"producten" : new_doc}})
+
+class Formaat:
+    def __init__(self, product, cat, formaat):
+        self.product = product
+        self.cat = cat
+        self.formaat = formaat
+    
+    def insert(self, bestelnr):
+        new_doc = {
+            'product': self.product,
+            'cat': self.cat,
+            'formaat': self.formaat,
+        }
+
+        if self.bijz:
+            new_doc['bijz'] = self.bijz
+
+        bests.update_one({'bestelnr': bestelnr}, {"$push" : {"producten" : new_doc}})
+
+class BronVlees:
+    def __init__(self, product, bron, aantal):
+        self.product = product
+        self.bron = bron
+        self.aantal = aantal
+    
+    def insert(self, bestelnr):
+        new_doc = {
+            'product': self.product,
+            'bron': self.bron,
+            'aantal': self.aantal,
+        }
+
+        if self.bijz:
+            new_doc['bijz'] = self.bijz
+
+        bests.update_one({'bestelnr': bestelnr}, {"$push" : {"producten" : new_doc}})
+
+class Standaard:
+    def __init__(self, product, cat, aantal):
+        self.product = product
+        self.cat = cat,
+        self.aantal = aantal
+    
+    def insert(self, bestelnr):
+        new_doc = {
+            'product': self.product,
+            'cat': self.cat,
+            'aantal': self.aantal,
+        }
+
+        if self.bijz:
+            new_doc['bijz'] = self.bijz
+
+        bests.update_one({'bestelnr': bestelnr}, {"$push" : {"producten" : new_doc}})
