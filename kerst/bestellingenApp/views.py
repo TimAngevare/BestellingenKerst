@@ -17,18 +17,21 @@ def nieuw(request):
 
 
 def nieuwType(request):
-    try:
-        gekozen_type = request.POST['prod_type']
-    except (KeyError):
-        return render(request, 'nieuw.html', {
-            'error_message': "Je hebt geen type gekozen.",
-            'type_list': TYPES
-        })
+    if request.POST['done'] == 'Kies' or request.POST['done'] == 'Nog een product':
+        try:
+            gekozen_type = request.POST['prod_type']
+        except (KeyError):
+            return render(request, 'nieuw.html', {
+                'error_message': "Je hebt geen type gekozen.",
+                'type_list': TYPES
+            })
+        else:
+            return render(request, 'gekozenNieuw.html', {
+                'gekozen_type': gekozen_type,
+                'type_list': TYPES
+            })
     else:
-        return render(request, 'gekozenNieuw.html', {
-            'gekozen_type': gekozen_type,
-            'type_list': TYPES
-        })
+        return HttpResponse('je was klaar')
 
 def zoek(request):
     return HttpResponse("Hier kan je zoeken naar een bestelling.")

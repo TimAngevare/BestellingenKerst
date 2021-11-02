@@ -3,7 +3,7 @@
 {% block content %}
 <div class="w3-container">
     <h3>Nieuwe toevoeging van type: {{gekozen_type}}</h3>
-    <form method="post" style="width: 30%;">
+    <form action="{% url 'bestellingenApp:nieuwType' %}" method="post" style="width: 30%;">
     {% csrf_token %}
         <fieldset>
             <legend><p>Voor bestelling</p></legend>
@@ -38,7 +38,7 @@
             <option value="{{ vleestype }}">{{ vleestype }}</option>
             {% endfor %}
         </select>
-        <input type="submit" name="another" value="Nog een product"><br><br>
+        <input type="submit" name="done" value="Nog een product"><br><br>
         <input type="submit" name="done" value="Klaar">
     </form>
     
