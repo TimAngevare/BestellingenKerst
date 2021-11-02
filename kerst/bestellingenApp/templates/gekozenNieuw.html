@@ -1,14 +1,46 @@
-{% extends 'nieuw.html' %}
+{% extends 'main.html' %}
 
-{% block inputSpace %}
+{% block content %}
 <div class="w3-container">
-    {% if gekozen_type == 'snijdvlees' %}
     <h3>Nieuwe toevoeging van type: {{gekozen_type}}</h3>
-    <form>
-        <input type='text'>
-    </form>
-    {% else %}
-    <h2>sukkel</h2>
+    <form method="post" style="width: 30%;">
+    {% csrf_token %}
+        <fieldset>
+            <legend><p>Voor bestelling</p></legend>
+            <label for="bestlnr">Bestelnummer:</label><br>
+            <input type='number' id="bestelnr" name="bestelnr" {% if bestelnr%}value={{ bestelnr }}{% endif %}><br>
+        </fieldset><br>
+
+        <label for="product">Product:</label><br>
+        <input type='text' id="product" name="product"><br>
+
+        <label for="cat">Categorie:</label><br>
+        <input type='text' id="cat" name="cat"><br>
+
+    {% if gekozen_type == 'snijdvlees' %}
+        <label for="gewicht">Gewicht:</label><br>
+        <input type='number' id="gewicht" name="gewicht"><br>
+
+        <label for="snijden">Snijden:</label><br>
+        <input type='text' id="snijden" name="snijden"><br>
+    {% elif gekozen_type == 'menu' %}
+        <label for="aantal">Aantal:</label><br>
+        <input type='number' id="aantal" name="aantal"><br>
     {% endif %}
+        
+        <label for="bijz">Bijzonderheden:</label><br>
+        <input type='text' id="bijz" name="bijz"><br>
+
+        
+
+        <select name='prod_type'>
+            {% for vleestype in type_list %}
+            <option value="{{ vleestype }}">{{ vleestype }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" name="another" value="Nog een product"><br><br>
+        <input type="submit" name="done" value="Klaar">
+    </form>
+    
 </div>
-{% endblock inputSpace %}
+{% endblock content %}
