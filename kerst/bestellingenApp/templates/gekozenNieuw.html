@@ -3,42 +3,46 @@
 {% block content %}
 <div class="w3-container">
     <h3>Nieuwe toevoeging van type: {{gekozen_type}}</h3>
-    <form action="{% url 'bestellingenApp:nieuwType' %}" method="post" style="width: 30%;">
+    {% if error_message %}<div class="w3-panel w3-red"><p>{{ error_message }}</p></div>{% endif %}
+    <form action="{% url 'bestellingenApp:nieuwekeuze' %}" method="post" style="width: 30%;">
     {% csrf_token %}
         <fieldset>
             <legend><p>Voor bestelling</p></legend>
             <label for="bestlnr">Bestelnummer:</label><br>
             <input type='number' id="bestelnr" name="bestelnr" {% if bestelnr%}value={{ bestelnr }}{% endif %}><br>
+            
         </fieldset><br>
 
+        <label for="huidig_type">Huidig type:</label><br>
+        <input type="text" name="huidig_type" id="huidig_type" value="{{gekozen_type}}" disabled><br>
+
         <label for="product">Product:</label><br>
-        <input type='text' id="product" name="product"><br>
+        <input type='text' id="product" name="product" required><br>
 
         <label for="cat">Categorie:</label><br>
-        <input type='text' id="cat" name="cat"><br>
+        <input type='text' id="cat" name="cat" required><br>
 
     {% if gekozen_type == 'snijdvlees' %}
         <label for="gewicht">Gewicht:</label><br>
-        <input type='number' id="gewicht" name="gewicht"><br>
+        <input type='number' id="gewicht" name="gewicht" required><br>
 
         <label for="snijden">Snijden:</label><br>
-        <input type='text' id="snijden" name="snijden"><br>
+        <input type='text' id="snijden" name="snijden" required><br>
     {% elif gekozen_type == 'menu' %}
         <label for="aantal">Aantal:</label><br>
-        <input type='number' id="aantal" name="aantal"><br>
+        <input type='number' id="aantal" name="aantal" required><br>
     {% endif %}
         
         <label for="bijz">Bijzonderheden:</label><br>
         <input type='text' id="bijz" name="bijz"><br>
-
-        
 
         <select name='prod_type'>
             {% for vleestype in type_list %}
             <option value="{{ vleestype }}">{{ vleestype }}</option>
             {% endfor %}
         </select>
-        <input type="submit" name="done" value="Nog een product"><br><br>
+        <input type="submit" name="done" value="Nog een product">
+        <input type="reset" value="Reset"><br><br>
         <input type="submit" name="done" value="Klaar">
     </form>
     
