@@ -5,16 +5,22 @@
     <h3>Nieuwe toevoeging van type: {{gekozen_type}}</h3>
     {% if error_message %}<div class="w3-panel w3-red"><p>{{ error_message }}</p></div>{% endif %}
     <form action="{% url 'bestellingenApp:nieuwekeuze' %}" method="post" style="width: 30%;">
-    {% csrf_token %}
+        {% csrf_token %}
         <fieldset>
             <legend><p>Voor bestelling</p></legend>
-            <label for="bestlnr">Bestelnummer:</label><br>
-            <input type='number' id="bestelnr" name="bestelnr" {% if bestelnr%}value={{ bestelnr }}{% endif %}><br>
+            <label for="bestelnr">Bestelnummer:</label><br>
+            <input type='number' id="bestelnr" name="bestelnr" value="{{ passed_bestelnr }}" disabled><br>
+            <input type='hidden' id="bestelnr" name="bestelnr" value="{{ passed_bestelnr }}">
+
+            <label for="usr_email">Email:</label><br>
+            <input type='email' id="usr_email" name="usr_email" value="{{ passed_email }}" disabled><br>
+            <input type='hidden' id="usr_email" name="usr_email" value="{{ passed_email }}">
             
         </fieldset><br>
 
         <label for="huidig_type">Huidig type:</label><br>
-        <input type="text" name="huidig_type" id="huidig_type" value="{{gekozen_type}}" disabled><br>
+        <input type="text" name="huidig_type" id="huidig_type" value="{{ gekozen_type }}" disabled><br>
+        <input type="hidden" name="huidig_type" id="huidig_type" value="{{ gekozen_type }}"><br>
 
         <label for="product">Product:</label><br>
         <input type='text' id="product" name="product" required><br>

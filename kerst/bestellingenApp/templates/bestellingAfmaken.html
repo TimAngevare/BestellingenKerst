@@ -2,6 +2,29 @@
 
 {% block content %}
 <div class="w3-container">
+    <h3>Afronding bestelling {{passed_bestelnr}}</h3>
+    <form action="{% url 'bestellingenApp:besteldone' %}" method="post" style="width: 30%;">
+        {% csrf_token %}
+        <label for="usr_email">E-mail adres:</label><br>
+        <input type='email' id="usr_email" name="usr_email" value="{{ passed_email }}" required><br>
 
+        <label for="naam">Naam:</label><br>
+        <input type='text' id="naam" name="naam" required><br>
+
+        <label for="telnr">Telefoon nummer:</label><br>
+        <input type='tel' id="telnr" name="telnr" required><br>
+
+        <br><label for="dagophalen">Dag van Ophalen:</label><br>
+        <input type='radio' id="22" name="dagophalen" value="22-12">
+        <label for="22">22-10</label><br>
+        <input type='radio' id="23" name="dagophalen" value="23-12">
+        <label for="23">23-10</label><br>
+        <input type='radio' id="24" name="dagophalen" value="24-12">
+        <label for="24">24-10</label><br><br>
+
+        <input type="hidden" name="bestelnr" value={{passed_bestelnr}}>
+
+        <input type="submit" value="Afronden">
+    </form>
 </div>
 {% endblock content %}
