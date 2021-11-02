@@ -1,0 +1,14 @@
+{% extends 'nieuw.html' %}
+
+{% block inputSpace %}
+<div class="w3-container">
+    {% if gekozen_type == 'snijdvlees' %}
+    <h3>Nieuwe toevoeging van type: {{gekozen_type}}</h3>
+    <form>
+        <input type='text'>
+    </form>
+    {% else %}
+    <h2>sukkel</h2>
+    {% endif %}
+</div>
+{% endblock inputSpace %}

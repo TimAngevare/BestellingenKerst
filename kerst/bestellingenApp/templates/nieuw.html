@@ -1,0 +1,21 @@
+{% extends "main.html" %}
+
+{% block title%}Nieuwe Bestelling{% endblock %}
+
+{% block content %}
+<div class="w3-container">
+    <h1>Nieuwe bestelling</h1>
+    <form action="{% url 'bestellingenApp:nieuwType' %}" method="post">
+    {% csrf_token %}
+        {% if error_message %}<div class="w3-panel w3-red"><p>{{ error_message }}</p></div>{% endif %}
+        <select name='prod_type'>
+            {% for vleestype in type_list %}
+            <option value="{{ vleestype }}">{{ vleestype }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Kies">
+    </form>
+</div>
+
+{% block inputSpace %}{% endblock inputSpace %}
+{% endblock %}

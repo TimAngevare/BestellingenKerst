@@ -1,3 +1,3 @@
 from django.db import models
 
-# Create your models here.
+TYPES = ['snijdvlees', 'menu', 'gourmet','formaat', 'bronvlees']
