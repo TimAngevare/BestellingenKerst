@@ -19,7 +19,7 @@ def index(request):
     return render(request, 'main.html')
 
 def nieuw(request):
-    return render(request, 'nieuw.html', {
+    return render(request, 'nieuwApp/nieuw.html', {
         'form': NieuweBestellingForm()
     })
 
@@ -44,7 +44,7 @@ def nieuw_bestel(request):
             }
             bests.insert_one(doc)
 
-            return render(request, 'gekozenNieuw.html', {
+            return render(request, 'nieuwApp/gekozenNieuw.html', {
                 'gekozen_type': gekozen_type,
                 'type_list': TYPES,
                 'passed_bestelnr': bestelnr,
@@ -52,7 +52,7 @@ def nieuw_bestel(request):
                 'products_list': prod_list
             })
         
-        return render(request, 'nieuw.html', {
+        return render(request, 'nieuwApp/nieuw.html', {
             'form': form
         })
     else:
@@ -62,7 +62,7 @@ def nieuw_entry(request, bestelnr, email):
     try:
         gekozen_type = request.POST['prod_type']
     except (KeyError):
-        return render(request, 'gekozenNieuw.html', {
+        return render(request, 'nieuwApp/gekozenNieuw.html', {
             'error_message': "Je hebt geen type gekozen.",
             'gekozen_type': 'snijdvlees',
             'type_list': TYPES,
@@ -71,7 +71,7 @@ def nieuw_entry(request, bestelnr, email):
             'products_list': prod_list
         })
     else:
-        return render(request, 'gekozenNieuw.html', {
+        return render(request, 'nieuwApp/gekozenNieuw.html', {
             'gekozen_type': gekozen_type,
             'type_list': TYPES,
             'passed_bestelnr': bestelnr,
@@ -86,7 +86,7 @@ def bestel_done(request):
 
 def bestel_pre_finish(request, bestelnr, email):
     
-    return render(request, 'bestellingAfmaken.html', {
+    return render(request, 'nieuwApp/bestellingAfmaken.html', {
         'passed_bestelnr': bestelnr,
         'passed_email': email
     })
