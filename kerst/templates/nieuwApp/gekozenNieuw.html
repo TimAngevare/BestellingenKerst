@@ -1,68 +1,86 @@
 {% extends 'main.html' %}
 
 {% block content %}
-<div class="w3-container">
-    <h3>Nieuwe toevoeging van type: {{gekozen_type}}</h3>
-    {% if error_message %}<div class="w3-panel w3-red"><p>{{ error_message }}</p></div>{% endif %}
-    <form autocomplete="off" action="{% url 'nieuwApp:nieuwproduct' %}" method="post" style="width: 30%;">
-        {% csrf_token %}
-        <fieldset>
-            <legend><p>Voor bestelling</p></legend>
-            <label for="bestelnr">Bestelnummer:</label><br>
-            <input type='number' id="bestelnr" name="bestelnr" value="{{ passed_bestelnr }}" disabled><br>
-            <input type='hidden' id="bestelnr" name="bestelnr" value="{{ passed_bestelnr }}">
 
-            <label for="usr_email">Email:</label><br>
-            <input type='email' id="usr_email" name="usr_email" value="{{ passed_email }}" disabled><br>
-            <input type='hidden' id="usr_email" name="usr_email" value="{{ passed_email }}">
+{% if error_message %}<div class="w3-panel w3-red"><p>{{ error_message }}</p></div>{% endif %}
+
+<div class="w3-row w3-margin">
+    <div class="w3-card w3-third" style="margin-right: 100px;">
+        <header class="w3-container w3-blue-grey">
+            <h3>Nieuw product - {{gekozen_type}}</h3>
+        </header>
+        <form autocomplete="off" action="{% url 'nieuwApp:nieuwproduct' %}" method="post" class="w3-container w3-margin">
+            {% csrf_token %}
+            <input type="hidden" name="huidig_type" id="huidig_type" value="{{ gekozen_type }}">
+            <input type="hidden" name="bestelnr" id="bestelnr" value="{{ passed_bestelnr }}">
+            <input type="hidden" name="usr_email" id="usr_email" value="{{ passed_email }}">
+
             
-        </fieldset><br>
 
-        <label for="huidig_type">Huidig type:</label><br>
-        <input type="text" name="huidig_type" id="huidig_type" value="{{ gekozen_type }}" disabled><br>
-        <input type="hidden" name="huidig_type" id="huidig_type" value="{{ gekozen_type }}"><br>
-
-        <label for="product">Product:</label><br>
-        <input list="products" id="product" name="product" required>
-        <datalist id="products">
-        {% for prod in products_list %}
-           <option value="{{prod}}"> 
-        {% endfor %}
-        </datalist><br>
-
-        <label for="cat">Categorie:</label><br>
-        <input type='text' id="cat" name="cat" required><br>
-
-    {% if gekozen_type == 'snijdvlees' %}
-        <label for="gewicht">Gewicht:</label><br>
-        <input type='number' id="gewicht" name="gewicht" required><br>
-
-        <label for="snijden">Snijden:</label><br>
-        <input type='text' id="snijden" name="snijden" required><br>
-
-    {% elif gekozen_type == 'menu' %}
-        <label for="aantal">Aantal:</label><br>
-        <input type='number' id="aantal" name="aantal" required><br>
-
-    {% elif gekozen_type == 'gourmet' %}
-        <label for="config">Configuratie:</label><br>
-        
-        <input type='checkbox' id="{{prod}}" name="{{prod}}" required><br>
-
-    {% endif %}
-        
-        <label for="bijz">Bijzonderheden:</label><br>
-        <input type='text' id="bijz" name="bijz"><br>
-
-        <select name='prod_type'>
-            {% for vleestype in type_list %}
-            <option value="{{ vleestype }}">{{ vleestype }}</option>
+            <label for="product">Product:</label><br>
+            <input class="w3-input w3-border" list="products" id="product" name="product" required>
+            <datalist id="products">
+            {% for prod in products_list %}
+            <option value="{{prod}}"> 
             {% endfor %}
-        </select>
-        <input type="submit" name="done" value="Nog een product">
-        <input type="reset" value="Reset"><br><br>
-        <input type="submit" name="done" value="Klaar">
-    </form>
+            </datalist><br>
+
+            <label for="cat">Categorie:</label><br>
+            <input class="w3-input w3-border" type='text' id="cat" name="cat" required><br>
+
+            {% if gekozen_type == 'snijdvlees' %}
+                <label for="gewicht">Gewicht:</label><br>
+                <input class="w3-input w3-border" type='number' id="gewicht" name="gewicht" required><br>
+
+                <label for="snijden">Snijden:</label><br>
+                <input class="w3-input w3-border" type='text' id="snijden" name="snijden" pattern="(\d+:\d+,)+" required><br>
+
+            {% elif gekozen_type == 'menu' %}
+                <label for="aantal">Aantal:</label><br>
+                <input class="w3-input w3-border" type='number' id="aantal" name="aantal" required><br>
+
+            {% elif gekozen_type == 'gourmet' %}
+                <label for="config">Configuratie:</label><br>
+                    
+                <input type='checkbox' id="{{prod}}" name="{{prod}}" required><br>
+
+            {% endif %}
+                    
+            <label for="bijz">Bijzonderheden:</label><br>
+            <input class="w3-input w3-border" type='text' id="bijz" name="bijz"><br><br>
+
+            <select name='prod_type' class="w3-select">
+                {% for vleeskey, vleesvalue in type_dict.items %}
+                <option value="{{ vleeskey }}">{{ vleesvalue }}</option>
+                {% endfor %}
+            </select><br>
+
+            <div class="w3-bar w3-container w3-margin">
+                <input class="w3-btn w3-round-large w3-amber" style="width: 35%;" type="submit" name="done" value="Nog een product">
+                <input class="w3-btn w3-round-large w3-blue" style="width: 25%;" type="submit" name="done" value="Klaar">
+                <input class="w3-btn w3-round-large w3-red" style="width: 35%;" type="submit" name="done" value="Verwijder bestelling">
+            </div>
+        </form>
+    </div>
+
+    <div class="w3-card w3-third w3-center">
+        <header class="w3-container w3-green">
+                <h3>Huidige Bestelling</h3>
+        </header>
+        <div class="w3-container">
+            <p><strong>Bestelnummer</strong></p>
+            <p>{{passed_bestelnr}}</p>
+            <p><strong>Email adres</strong></p>
+            <p>{{passed_email}}</p>
+        </div>
+    </div>
     
 </div>
+
+<script>
+    var snijd_input = document.getElementById('snijden');
+    snijd_input.oninvalid = function(event) {
+        event.target.setCustomValidity('x aantal keer: (gewicht):(aantal),');
+    }
+</script>
 {% endblock content %}
