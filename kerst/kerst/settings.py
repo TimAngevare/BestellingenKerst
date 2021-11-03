@@ -31,7 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'bestellingenApp.apps.BestellingenappConfig',
+    'nieuwApp.apps.NieuwappConfig',
+    #'zoekApp.apps.ZoekappConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

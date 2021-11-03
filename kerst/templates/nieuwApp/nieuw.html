@@ -5,7 +5,7 @@
 {% block content %}
 <div class="w3-container">
     <h1>Nieuwe bestelling</h1>
-    <form action="{% url 'bestellingenApp:nieuwbestel' %}" method="post">
+    <form action="{% url 'nieuwApp:nieuwbestelling' %}" method="post">
     {% csrf_token %}
         {% if error_message %}<div class="w3-panel w3-red"><p>{{ error_message }}</p></div>{% endif %}
         {{ form }}

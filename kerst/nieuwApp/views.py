@@ -82,7 +82,7 @@ def nieuw_entry(request, bestelnr, email):
 def bestel_done(request):
     bests.update_one({'bestelnr': int(request.POST['bestelnr'])},{"$set": {"email" : request.POST['usr_email'], "naam" : request.POST['naam'], "telnr" : request.POST['telnr'], "dagophalen" : request.POST['dagophalen'], "besteltijd" : datetime.datetime.utcnow()}})
 
-    return HttpResponseRedirect('nieuw')
+    return HttpResponseRedirect('')
 
 def bestel_pre_finish(request, bestelnr, email):
     
@@ -113,6 +113,3 @@ def nieuw_keuze(request):
         return(bestel_pre_finish(request, bestelnr, email))
     else:
         return(nieuw_entry(request, bestelnr, email))
-
-def zoek(request):
-    return HttpResponse("Hier kan je zoeken naar een bestelling.")

@@ -4,7 +4,7 @@
 <div class="w3-container">
     <h3>Nieuwe toevoeging van type: {{gekozen_type}}</h3>
     {% if error_message %}<div class="w3-panel w3-red"><p>{{ error_message }}</p></div>{% endif %}
-    <form autocomplete="off" action="{% url 'bestellingenApp:nieuwekeuze' %}" method="post" style="width: 30%;">
+    <form autocomplete="off" action="{% url 'nieuwApp:nieuwproduct' %}" method="post" style="width: 30%;">
         {% csrf_token %}
         <fieldset>
             <legend><p>Voor bestelling</p></legend>

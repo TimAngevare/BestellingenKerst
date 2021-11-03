@@ -3,7 +3,7 @@
 {% block content %}
 <div class="w3-container">
     <h3>Afronding bestelling {{passed_bestelnr}}</h3>
-    <form action="{% url 'bestellingenApp:besteldone' %}" method="post" style="width: 30%;">
+    <form action="{% url 'nieuwApp:besteldone' %}" method="post" style="width: 30%;">
         {% csrf_token %}
         <label for="usr_email">E-mail adres:</label><br>
         <input type='email' id="usr_email" name="usr_email" value="{{ passed_email }}" required><br>
