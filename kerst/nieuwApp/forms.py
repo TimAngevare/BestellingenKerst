@@ -1,21 +1,28 @@
 from django.core.validators import RegexValidator
 snijd_validator = RegexValidator(r"(\d+:\d+,)+", "x aantal keer: (gewicht):(aantal),")
+telnr_validator = RegexValidator(r"^\+316\d{8}$", "Moet beginnen met: +316")
 
 from django import forms
 
 TYPE_OPTION = (
+    ("standaard", "Standaard"),
     ("snijdvlees", "Snijdbaar vlees"),
     ("menu", "Menu"),
     ("gourmet", "Gourmet"),
     ("formaat", "Bepaald formaat"),
     ("bronvlees", "Speciaalvlees"),
-    ("standaard", "Standaard"),
 )
 
 FORMAAT_OPTION = (
     ('klein', 'Klein'),
     ('groot', 'Groot'),
 )
+
+DAGEN_OPHALEN_OPTION = [
+    ('23', '23-12'),
+    ('24', '24-12'),
+    ('25', '25-12')
+]
 
 temp_product = forms.CharField(label="Product", max_length=100, widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'list': 'products'}))
 temp_cat = forms.CharField(label="Categorie", max_length=100, widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
@@ -27,6 +34,11 @@ temp_gewicht = forms.IntegerField(label="Gewicht", min_value=0, widget=forms.Num
 class NieuweBestellingForm(forms.Form):
     prod_type = temp_prod_type
     usr_email = forms.EmailField(label="E-mail adres", max_length=100, widget=forms.EmailInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
+
+class BestellingAfmakenForm(forms.Form):
+    naam = forms.CharField(label="Naam", max_length=150, widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
+    telnr = forms.CharField(label="Telefoon nummer", max_length=12, validators=[telnr_validator], widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'value': '+316'}))
+    dagophalen = forms.ChoiceField(label="Dag ophalen", choices=DAGEN_OPHALEN_OPTION, widget=forms.RadioSelect())
 
 class SnijdForm(forms.Form):
     product = temp_product

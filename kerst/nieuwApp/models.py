@@ -115,7 +115,7 @@ class BronVlees:
 class Standaard:
     def __init__(self, product, cat, aantal, bijz):
         self.product = product
-        self.cat = cat,
+        self.cat = cat
         self.aantal = aantal
         self.bijz = bijz
     

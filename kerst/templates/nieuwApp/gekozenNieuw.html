@@ -17,47 +17,11 @@
 
             {{form}}
 
-            {% comment %}
-            <label for="product">Product:</label><br>
-            <input class="w3-input w3-border" list="products" id="product" name="product" required><br>
-            
-
-            <label for="cat">Categorie:</label><br>
-            <input class="w3-input w3-border" type='text' id="cat" name="cat" required><br>
-
-            {% if gekozen_type == 'snijdvlees' %}
-                <label for="gewicht">Gewicht:</label><br>
-                <input class="w3-input w3-border" type='number' id="gewicht" name="gewicht" required><br>
-
-                <label for="snijden">Snijden:</label><br>
-                <input class="w3-input w3-border" type='text' id="snijden" name="snijden" pattern="(\d+:\d+,)+" required><br>
-
-            {% elif gekozen_type == 'menu' %}
-                <label for="aantal">Aantal:</label><br>
-                <input class="w3-input w3-border" type='number' id="aantal" name="aantal" required><br>
-
-            {% elif gekozen_type == 'gourmet' %}
-                <label for="config">Configuratie:</label><br>
-                    
-                <input type='checkbox' id="{{prod}}" name="{{prod}}" required><br>
-
-            {% endif %}
-                    
-            <label for="bijz">Bijzonderheden:</label><br>
-            <input class="w3-input w3-border" type='text' id="bijz" name="bijz"><br><br>
-
-            {% endcomment %}
             <datalist id="products">
-            {% for prod in products_list %}
-            <option value="{{prod}}"> 
-            {% endfor %}
-            </datalist>
-
-            {% comment %} <select name='prod_type' class="w3-select">
-                {% for vleeskey, vleesvalue in type_dict.items %}
-                <option value="{{ vleeskey }}">{{ vleesvalue }}</option>
+                {% for prod in products_list %}
+                <option value="{{prod}}"> 
                 {% endfor %}
-            </select><br> {% endcomment %}
+            </datalist>
 
             <div class="w3-bar w3-container w3-margin">
                 <input class="w3-btn w3-round-large w3-amber" style="width: 35%;" type="submit" name="done" value="Nog een product">

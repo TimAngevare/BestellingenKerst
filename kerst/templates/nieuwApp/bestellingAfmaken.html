@@ -1,31 +1,21 @@
 {% extends 'main.html' %}
 
 {% block content %}
+
+{% if error_message %}<div class="w3-panel w3-red w3-container"><p>{{ error_message }}</p></div>{% endif %}
+
 <div class="w3-container">
     <div class="w3-card w3-margin" style="width: 50%;">
         <header class="w3-container w3-teal">
-            <h3>Afronding bestelling {{passed_bestelnr}}</h3>
+            <h3>Afronding bestelling #{{passed_bestelnr}}</h3>
         </header>
         <form action="{% url 'nieuwApp:besteldone' %}" method="post" class="w3-container w3-margin">
             {% csrf_token %}
-            <label for="usr_email">E-mail adres:</label><br>
-            <input class="w3-input w3-border" type='email' id="usr_email" name="usr_email" value="{{ passed_email }}" required><br>
 
-            <label for="naam">Naam:</label><br>
-            <input class="w3-input w3-border" type='text' id="naam" name="naam" required><br>
-
-            <label for="telnr">Telefoon nummer:</label><br>
-            <input class="w3-input w3-border" type='tel' id="telnr" name="telnr" required><br>
-
-            <label for="dagophalen">Dag van ophalen:</label><br>
-            <input class="w3-radio" type='radio' id="22" name="dagophalen" value="22-12">
-            <label for="22">22-10</label><br>
-            <input class="w3-radio" type='radio' id="23" name="dagophalen" value="23-12">
-            <label for="23">23-10</label><br>
-            <input class="w3-radio" type='radio' id="24" name="dagophalen" value="24-12">
-            <label for="24">24-10</label><br>
+            {{form}}
 
             <input type="hidden" name="bestelnr" value={{passed_bestelnr}}>
+            <input type="hidden" name="usr_email" value={{passed_email}}>
 
             <input class="w3-btn w3-round-large w3-blue w3-margin" type="submit" value="Afronden">
         </form>
