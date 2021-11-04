@@ -2,7 +2,7 @@
 
 {% block content %}
 
-{% if error_message %}<div class="w3-panel w3-red"><p>{{ error_message }}</p></div>{% endif %}
+{% if error_message %}<div class="w3-panel w3-red w3-container"><p>{{ error_message }}</p></div>{% endif %}
 
 <div class="w3-row w3-margin">
     <div class="w3-card w3-third" style="margin-right: 100px;">
@@ -15,15 +15,12 @@
             <input type="hidden" name="bestelnr" id="bestelnr" value="{{ passed_bestelnr }}">
             <input type="hidden" name="usr_email" id="usr_email" value="{{ passed_email }}">
 
-            
+            {{form}}
 
+            {% comment %}
             <label for="product">Product:</label><br>
-            <input class="w3-input w3-border" list="products" id="product" name="product" required>
-            <datalist id="products">
-            {% for prod in products_list %}
-            <option value="{{prod}}"> 
-            {% endfor %}
-            </datalist><br>
+            <input class="w3-input w3-border" list="products" id="product" name="product" required><br>
+            
 
             <label for="cat">Categorie:</label><br>
             <input class="w3-input w3-border" type='text' id="cat" name="cat" required><br>
@@ -49,11 +46,18 @@
             <label for="bijz">Bijzonderheden:</label><br>
             <input class="w3-input w3-border" type='text' id="bijz" name="bijz"><br><br>
 
-            <select name='prod_type' class="w3-select">
+            {% endcomment %}
+            <datalist id="products">
+            {% for prod in products_list %}
+            <option value="{{prod}}"> 
+            {% endfor %}
+            </datalist>
+
+            {% comment %} <select name='prod_type' class="w3-select">
                 {% for vleeskey, vleesvalue in type_dict.items %}
                 <option value="{{ vleeskey }}">{{ vleesvalue }}</option>
                 {% endfor %}
-            </select><br>
+            </select><br> {% endcomment %}
 
             <div class="w3-bar w3-container w3-margin">
                 <input class="w3-btn w3-round-large w3-amber" style="width: 35%;" type="submit" name="done" value="Nog een product">
@@ -68,7 +72,7 @@
                 <h3>Huidige Bestelling</h3>
         </header>
         <div class="w3-container">
-            <p><strong>Bestelnummer</strong></p>
+            <p><strong>Bestelling</strong></p>
             <p>{{passed_bestelnr}}</p>
             <p><strong>Email adres</strong></p>
             <p>{{passed_email}}</p>
@@ -76,11 +80,4 @@
     </div>
     
 </div>
-
-<script>
-    var snijd_input = document.getElementById('snijden');
-    snijd_input.oninvalid = function(event) {
-        event.target.setCustomValidity('x aantal keer: (gewicht):(aantal),');
-    }
-</script>
 {% endblock content %}

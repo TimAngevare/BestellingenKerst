@@ -54,10 +54,11 @@ class Menu:
         bests.update_one({'bestelnr': bestelnr}, {"$push" : {"producten" : new_doc}})
 
 class Gourmet:
-    def __init__(self, product, cat, conf):
+    def __init__(self, product, cat, conf, bijz):
         self.product = product
         self.cat = cat
         self.conf = conf
+        self.bijz = bijz
     
     def insert(self, bestelnr):
         new_doc = {
@@ -72,16 +73,19 @@ class Gourmet:
         bests.update_one({'bestelnr': bestelnr}, {"$push" : {"producten" : new_doc}})
 
 class Formaat:
-    def __init__(self, product, cat, formaat):
+    def __init__(self, product, cat, formaat, aantal, bijz):
         self.product = product
         self.cat = cat
         self.formaat = formaat
+        self.aantal = aantal
+        self.bijz = bijz
     
     def insert(self, bestelnr):
         new_doc = {
             'product': self.product,
             'cat': self.cat,
             'formaat': self.formaat,
+            'aantal': self.aantal
         }
 
         if self.bijz:
@@ -90,16 +94,17 @@ class Formaat:
         bests.update_one({'bestelnr': bestelnr}, {"$push" : {"producten" : new_doc}})
 
 class BronVlees:
-    def __init__(self, product, bron, aantal):
+    def __init__(self, product, bron, gewicht, bijz):
         self.product = product
         self.bron = bron
-        self.aantal = aantal
+        self.gewicht = gewicht
+        self.bijz = bijz
     
     def insert(self, bestelnr):
         new_doc = {
             'product': self.product,
             'bron': self.bron,
-            'aantal': self.aantal,
+            'gewicht': self.gewicht,
         }
 
         if self.bijz:
@@ -108,10 +113,11 @@ class BronVlees:
         bests.update_one({'bestelnr': bestelnr}, {"$push" : {"producten" : new_doc}})
 
 class Standaard:
-    def __init__(self, product, cat, aantal):
+    def __init__(self, product, cat, aantal, bijz):
         self.product = product
         self.cat = cat,
         self.aantal = aantal
+        self.bijz = bijz
     
     def insert(self, bestelnr):
         new_doc = {
