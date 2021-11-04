@@ -28,15 +28,15 @@ def kies_form(het_type):
     if het_type == 'snijdvlees':
         return SnijdForm()
     elif het_type == 'menu':
-        return SnijdForm()
+        return MenuForm()
     elif het_type == 'gourmet':
-        return SnijdForm()
+        return GourmetForm()
     elif het_type == 'formaat':
-        return SnijdForm()
+        return FormaatForm()
     elif het_type == 'bronvlees':
-        return SnijdForm()
+        return BronVleesForm()
     elif het_type == 'standaard':
-        return SnijdForm()
+        return StandaardForm()
 
 def nieuw_bestel(request):
     if request.method == 'POST':
@@ -54,6 +54,7 @@ def nieuw_bestel(request):
 
             email = form.cleaned_data['usr_email']
             gekozen_type = form.cleaned_data['prod_type']
+            print(gekozen_type)
 
             doc = {
                 "email": email,
