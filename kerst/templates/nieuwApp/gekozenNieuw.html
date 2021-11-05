@@ -43,14 +43,16 @@
                 <p>{{passed_email}}</p>
             </div>
         </div>
+        {% if gekozen_type == 'menu' %}
         <div class="w3-card w3-margin">
             <header class="w3-container w3-indigo">
                     <h3>Speciaal bij menu's</h3>
             </header>
             <div class="w3-container">
-                <p>Bij het <strong>Traditioneel Kerstmenu</strong> zit automatisch het Beef Wellington hoofdgerecht en een dessert buffet, deze keuze hoeft dus niet gemaakt te worden.</p>
+                <p>Bij het <strong>traditioneel kerstmenu</strong> zit automatisch het Beef Wellington hoofdgerecht en een dessert buffet, deze keuze hoeft dus niet gemaakt te worden.</p>
             </div>
         </div>
+        {% endif %}
     </div>
     
 </div>

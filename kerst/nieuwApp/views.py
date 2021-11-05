@@ -11,7 +11,8 @@ from utils import get_db
 kerst_db = get_db('kerst_db')
 bests = kerst_db['bestellingen']
 
-prod_list = ['kip', 'ossenhaas', 'hamburger menu']
+prod_list_menu = ['traditioneel kerstmenu', 'dorpsslagers kerstmenu']
+prod_list = ['ossenhaas', 'kip', 'beef wellington']
 
 def index(request):
     return render(request, 'main.html', {
@@ -25,17 +26,17 @@ def nieuw(request):
 
 def kies_form(het_type):
     if het_type == 'snijdvlees':
-        return SnijdForm()
+        return SnijdForm(), prod_list
     elif het_type == 'menu':
-        return MenuForm()
+        return MenuForm(), prod_list_menu
     elif het_type == 'gourmet':
-        return GourmetForm()
+        return GourmetForm(), prod_list
     elif het_type == 'formaat':
-        return FormaatForm()
+        return FormaatForm(), prod_list
     elif het_type == 'bronvlees':
-        return BronVleesForm()
+        return BronVleesForm(), prod_list
     elif het_type == 'standaard':
-        return StandaardForm()
+        return StandaardForm(), prod_list
 
 def nieuw_bestel(request):
     if request.method == 'POST':
@@ -54,12 +55,13 @@ def nieuw_bestel(request):
             }
             bests.insert_one(doc)
 
+            form_info = kies_form(gekozen_type)
             return render(request, 'nieuwApp/gekozenNieuw.html', {
                 'gekozen_type': gekozen_type,
                 'passed_bestelnr': bestelnr,
                 'passed_email': email,
-                'products_list': prod_list,
-                'form': kies_form(gekozen_type)
+                'products_list': form_info[1],
+                'form': form_info[0]
             })
         
         return render(request, 'nieuwApp/nieuw.html', {
@@ -81,17 +83,19 @@ def nieuw_entry(request, bestelnr, email):
             'form': SnijdForm()
         })
     else:
+        form_info = kies_form(gekozen_type)
         return render(request, 'nieuwApp/gekozenNieuw.html', {
             'gekozen_type': gekozen_type,
             'passed_bestelnr': bestelnr,
             'passed_email': email,
-            'products_list': prod_list,
-            'form': kies_form(gekozen_type)
+            'products_list': form_info[1],
+            'form': form_info[0]
         })
 
 def bestel_done(request):
     if request.method == 'POST':
         form = BestellingAfmakenForm(request.POST)
+
         if form.is_valid():
             data = form.cleaned_data
             obj_bestelnrs = bests.find({}, {'bestelnr':1})
@@ -176,8 +180,60 @@ def nieuw_keuze(request):
                 })
         
         elif oude_type == 'menu':
-            Menu(request.POST['product'], request.POST['cat'], int(request.POST['aantal']), request.POST['voorgerecht'], request.POST['hoofdgerecht'], request.POST['dessert'], request.POST['bijz']).insert(bestelnr)
-        
+            form = MenuForm(request.POST)
+            if form.is_valid() and request.POST['product'] in ['dorpsslagers kerstmenu', 'traditioneel kerstmenu']:
+                data = form.cleaned_data
+
+                if data['product'] == 'traditioneel kerstmenu':
+                    v_gerecht_doc = {}
+
+                    int_carp = int(data['carpaccio'])
+                    int_ragout= int(data['kalfsragout'])
+                    if int_carp > 0:
+                        v_gerecht_doc['carpaccio'] = int_carp
+                    if int_ragout > 0:
+                        v_gerecht_doc['kalfsragout'] = int_ragout
+
+                    Menu('traditioneel kerstmenu', data['cat'], int(data['aantal']), v_gerecht_doc, 'beef wellington', 'dessert buffet', data['bijz']).insert(bestelnr)
+                else:
+                    v_gerecht_doc = {}
+                    h_gerecht_doc = {}
+                    dessert_doc = {}
+
+                    int_carp = int(data['carpaccio'])
+                    int_vt= int(data['vitello_tonato'])
+                    int_biefstuk = int(data['biefstuk'])
+                    int_varkenshaas= int(data['varkenshaas'])
+                    int_tiramisu = int(data['tiramisu'])
+                    int_apfelstrudel= int(data['apfelstrudel'])
+
+                    if int_carp > 0:
+                        v_gerecht_doc['carpaccio'] = int_carp
+                    if int_vt > 0:
+                        v_gerecht_doc['vitello_tonato'] = int_vt
+                    if int_biefstuk> 0:
+                        h_gerecht_doc['biefstuk'] = int_biefstuk
+                    if int_varkenshaas > 0:
+                        h_gerecht_doc['varkenshaas'] = int_varkenshaas
+                    if int_tiramisu > 0:
+                        dessert_doc['tiramisu'] = int_tiramisu
+                    if int_apfelstrudel > 0:
+                        dessert_doc['apfelstrudel'] = int_apfelstrudel
+
+                    
+                    Menu('dorpsslagers kerstmenu', data['cat'], int(data['aantal']), v_gerecht_doc, h_gerecht_doc, dessert_doc, data['bijz']).insert(bestelnr)
+ 
+            else:
+                return render(request, 'nieuwApp/gekozenNieuw.html', {
+                    'error_message': 'Oeps, er is iets mis gegaan. Waarschijnlijk heb je niet een menu-product gekozen.',
+                    'gekozen_type': oude_type,
+                    'passed_bestelnr': bestelnr,
+                    'passed_email': email,
+                    'products_list': prod_list_menu,
+                    'form': form
+                })
+
+            
         elif oude_type == 'gourmet':
             form = GourmetForm(request.POST)
             if form.is_valid():
