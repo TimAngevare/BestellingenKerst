@@ -42,14 +42,7 @@ def nieuw_bestel(request):
         form = NieuweBestellingForm(request.POST)
         if form.is_valid():
 
-            """
-            bestelnrlist = []
-            for entry in bests.find():
-                bestelnrlist.append(entry['bestelnr'])
-            bestelnr = choice([i for i in range(1, 4001) if i not in bestelnrlist])
-            """
-            huidig_aantal_bests = bests.count()
-            bestelnr = huidig_aantal_bests + 1
+            bestelnr = bests.count() + 1
 
             email = form.cleaned_data['usr_email']
             gekozen_type = form.cleaned_data['prod_type']

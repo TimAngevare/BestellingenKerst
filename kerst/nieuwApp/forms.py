@@ -45,6 +45,7 @@ class SnijdForm(forms.Form):
     cat = temp_cat
     gewicht = temp_gewicht
     snijden = forms.CharField(label="Snijden", max_length=100, validators=[snijd_validator], widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
+    
     bijz = temp_bijz
     prod_type = temp_prod_type
 
@@ -52,12 +53,22 @@ class MenuForm(forms.Form):
     product = temp_product
     cat = temp_cat
     aantal = temp_aantal
+
+    carpaccio = forms.IntegerField(label="(V-gerecht) Carpaccio", min_value=0, widget=forms.NumberInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'value': '0'}))
+    vitello_tonato = forms.IntegerField(label="(V-gerecht) Vitello tonato", min_value=0, widget=forms.NumberInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'value': '0'}))
+    kalfsragout = forms.IntegerField(label="(V-gerecht) Kalfsragout", min_value=0, widget=forms.NumberInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'value': '0'}))
+    biefstuk = forms.IntegerField(label="(H-gerecht) Biefstuk", min_value=0, widget=forms.NumberInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'value': '0'}))
+    varkenshaas = forms.IntegerField(label="(H-gerecht) Varkenshaas", min_value=0, widget=forms.NumberInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'value': '0'}))
+    tiramisu = forms.IntegerField(label="(Dessert) Tiramisu", min_value=0, widget=forms.NumberInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'value': '0'}))
+    apfelstrudel = forms.IntegerField(label="(Dessert) Apfelstrudel", min_value=0, widget=forms.NumberInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'value': '0'}))
+
     bijz = temp_bijz
     prod_type = temp_prod_type
 
 class GourmetForm(forms.Form):
     product = temp_product
     cat = temp_cat
+    
     bijz = temp_bijz
     prod_type = temp_prod_type
 
@@ -66,6 +77,7 @@ class FormaatForm(forms.Form):
     cat = temp_cat
     formaat = forms.ChoiceField(label="Formaat", choices=FORMAAT_OPTION, widget=forms.Select(attrs={'class': 'w3-select'}))
     aantal = temp_aantal
+    
     bijz = temp_bijz
     prod_type = temp_prod_type
 
@@ -74,6 +86,7 @@ class BronVleesForm(forms.Form):
     cat = temp_cat
     bron = forms.CharField(label="Bron", max_length=100, widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
     gewicht = temp_gewicht
+    
     bijz = temp_bijz
     prod_type = temp_prod_type
 
@@ -81,5 +94,6 @@ class StandaardForm(forms.Form):
     product = temp_product
     cat = temp_cat
     aantal = temp_aantal
+    
     bijz = temp_bijz
     prod_type = temp_prod_type
