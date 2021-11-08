@@ -1,7 +1,7 @@
 from django.core.validators import RegexValidator
 snijd_validator = RegexValidator(r"(\d+:\d+,)+", "x aantal keer: (gewicht):(aantal),")
 telnr_validator = RegexValidator(r"^\+316\d{8}$", "Moet beginnen met: +316")
-tijdophalen_validator = RegexValidator(r"^\d{2}:\d{2}$", "format: 00:00")
+tijdophalen_validator = RegexValidator(r"^\d{4}$", "format: 1330")
 
 from django import forms
 from django.utils.safestring import mark_safe

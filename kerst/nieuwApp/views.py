@@ -42,9 +42,6 @@ def nieuw_bestel(request):
     if request.method == 'POST':
         form = NieuweBestellingForm(request.POST)
         if form.is_valid():
-
-            bestelnr = bests.count() + 1
-
             email = form.cleaned_data['usr_email']
             gekozen_type = form.cleaned_data['prod_type']
             dag_ophalen = form.cleaned_data['dagophalen']
@@ -81,7 +78,7 @@ def nieuw_bestel(request):
             form_info = kies_form(gekozen_type)
             return render(request, 'nieuwApp/gekozenNieuw.html', {
                 'gekozen_type': gekozen_type,
-                'passed_bestelnr': bestelnr,
+                'passed_bestelnr': nieuw_bestelnr,
                 'passed_email': email,
                 'products_list': form_info[1],
                 'form': form_info[0]
@@ -101,12 +98,12 @@ def bestel_done(request):
             data = form.cleaned_data
             bestelnr = data['bestelnr']
 
-            bests.update_one({'bestelnr': int(request.POST['bestelnr'])},{"$set": {"bestelnr": bestelnr, "email" : request.POST['usr_email'], "naam" : data['naam'], "telnr" : data['telnr'], "dagophalen" : bestelnr[:2], "tijdophalen" : data['tijdophalen'], "besteltijd" : datetime.datetime.utcnow()}})
+            bests.update_one({'bestelnr': int(request.POST['bestelnr'])},{"$set": {"bestelnr": bestelnr, "email" : request.POST['usr_email'], "naam" : data['naam'], "telnr" : data['telnr'], "dagophalen" : bestelnr[:2], "tijdophalen" : int(data['tijdophalen']), "besteltijd" : datetime.datetime.utcnow()}})
 
             return HttpResponseRedirect('/')
         else:
             return render(request, 'nieuwApp/bestellingAfmaken.html', {
-                'error_message': 'Oeps er is iets mis, waarschijnlijk heb je het telefoonnummer niet correct ingevoerd. Het nummer moet beginnen met +316 en daarna 8 cijfers.',
+                'error_message': 'Oeps er is iets mis, waarschijnlijk heb je het telefoonnummer of de tijd van ophalen niet correct ingevoerd.',
                 'passed_bestelnr': request.POST['bestelnr'],
                 'passed_email': request.POST['usr_email'],
                 'form': form
@@ -286,4 +283,4 @@ def nieuw_keuze(request):
             })
 
     else:
-        return HttpResponse("kk djalla dit moet niet kunnen ga naar home ofzo")
+        return HttpResponse("sjongejonge dit is niet de bedoeling, hup ga weer terug naar home, toe maar, ga dan, komaan, tempo please")
