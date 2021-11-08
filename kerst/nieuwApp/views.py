@@ -4,15 +4,15 @@ from django.http import HttpResponse
 
 import datetime
 
-from .models import Snijdvlees, Menu, Gourmet, Formaat, BronVlees, Standaard
-from .forms import BestellingAfmakenForm, NieuweBestellingForm, SnijdForm, GourmetForm, MenuForm, FormaatForm, BronVleesForm, StandaardForm
+from .models import Snijdvlees, Menu, Gourmet, DryAgedVlees, Standaard
+from .forms import BestellingAfmakenForm, NieuweBestellingForm, SnijdForm, GourmetForm, MenuForm, DryAgedForm, StandaardForm
 
 from utils import get_db
 kerst_db = get_db('kerst_db')
 bests = kerst_db['bestellingen']
 
 prod_list_menu = ['traditioneel kerstmenu', 'dorpsslagers kerstmenu']
-prod_list = ['ossenhaas', 'kip', 'beef wellington']
+prod_list = ['ossenhaas', 'beef wellington', 'tapas plank klein', 'party pan klein', 'tapas plank groot', 'party pan groot']
 
 def index(request):
     return render(request, 'main.html', {
@@ -31,10 +31,10 @@ def kies_form(het_type):
         return MenuForm(), prod_list_menu
     elif het_type == 'gourmet':
         return GourmetForm(), prod_list
-    elif het_type == 'formaat':
-        return FormaatForm(), prod_list
-    elif het_type == 'bronvlees':
-        return BronVleesForm(), prod_list
+    # elif het_type == 'formaat':
+    #     return FormaatForm(), prod_list
+    elif het_type == 'dryaged':
+        return DryAgedForm(), prod_list
     elif het_type == 'standaard':
         return StandaardForm(), prod_list
 
@@ -47,10 +47,33 @@ def nieuw_bestel(request):
 
             email = form.cleaned_data['usr_email']
             gekozen_type = form.cleaned_data['prod_type']
+            dag_ophalen = form.cleaned_data['dagophalen']
+
+            obj_bestelnrs = bests.find({}, {'bestelnr':1})
+            list_bestelnrs = []
+            for obj_bnr in obj_bestelnrs:
+                list_bestelnrs.append(obj_bnr['bestelnr'])
+
+            hoogst_huidig = 0
+
+            for bnr in list_bestelnrs:
+                string_bnr = str(bnr)
+                if string_bnr[:2] == dag_ophalen:
+                    int_bnr = int(string_bnr[2:])
+                    if int_bnr > hoogst_huidig:
+                        hoogst_huidig = int_bnr
+            
+            nieuw_nr = hoogst_huidig + 1
+            str_nieuw_nr = str(nieuw_nr)
+            while len(str_nieuw_nr) < 4:
+                str_nieuw_nr = '0' + str_nieuw_nr
+
+            str_nieuw_bestelnr = dag_ophalen + str_nieuw_nr
+            nieuw_bestelnr = int(str_nieuw_bestelnr)
 
             doc = {
                 "email": email,
-                "bestelnr": bestelnr,
+                "bestelnr": nieuw_bestelnr,
                 "producten": []
             }
             bests.insert_one(doc)
@@ -76,31 +99,9 @@ def bestel_done(request):
 
         if form.is_valid():
             data = form.cleaned_data
-            obj_bestelnrs = bests.find({}, {'bestelnr':1})
-            list_bestelnrs = []
-            for obj_bnr in obj_bestelnrs:
-                list_bestelnrs.append(obj_bnr['bestelnr'])
-            
-            dag_ophalen = data['dagophalen']
+            bestelnr = data['bestelnr']
 
-            hoogst_huidig = 0
-
-            for bnr in list_bestelnrs:
-                string_bnr = str(bnr)
-                if string_bnr[:2] == dag_ophalen:
-                    int_bnr = int(string_bnr[2:])
-                    if int_bnr > hoogst_huidig:
-                        hoogst_huidig = int_bnr
-            
-            nieuw_nr = hoogst_huidig + 1
-            str_nieuw_nr = str(nieuw_nr)
-            while len(str_nieuw_nr) < 4:
-                str_nieuw_nr = '0' + str_nieuw_nr
-
-            str_nieuw_bestelnr = dag_ophalen[:2] + str_nieuw_nr
-            nieuw_bestelnr = int(str_nieuw_bestelnr)
-
-            bests.update_one({'bestelnr': int(request.POST['bestelnr'])},{"$set": {"bestelnr": nieuw_bestelnr, "email" : request.POST['usr_email'], "naam" : data['naam'], "telnr" : data['telnr'], "dagophalen" : dag_ophalen, "besteltijd" : datetime.datetime.utcnow()}})
+            bests.update_one({'bestelnr': int(request.POST['bestelnr'])},{"$set": {"bestelnr": bestelnr, "email" : request.POST['usr_email'], "naam" : data['naam'], "telnr" : data['telnr'], "dagophalen" : bestelnr[:2], "tijdophalen" : data['tijdophalen'], "besteltijd" : datetime.datetime.utcnow()}})
 
             return HttpResponseRedirect('/')
         else:
@@ -186,7 +187,7 @@ def nieuw_keuze(request):
                     if int_apfelstrudel > 0: dessert_doc['apfelstrudel'] = int_apfelstrudel
 
                     
-                    Menu('dorpsslagers kerstmenu', data['cat'], int(data['aantal']), v_gerecht_doc, h_gerecht_doc, dessert_doc, data['bijz']).insert(bestelnr)
+                    Menu('dorpsslagers_kerstmenu', data['cat'], int(data['aantal']), v_gerecht_doc, h_gerecht_doc, dessert_doc, data['bijz']).insert(bestelnr)
  
             else:
                 return render(request, 'nieuwApp/gekozenNieuw.html', {
@@ -221,27 +222,26 @@ def nieuw_keuze(request):
                     'form': form
                 })
 
+        # elif oude_type == 'formaat':
+        #     form = FormaatForm(request.POST)
+        #     if form.is_valid():
+        #         data = form.cleaned_data
+        #         Formaat(data['product'], data['cat'], data['formaat'], data['bijz']).insert(bestelnr)
+        #     else:
+        #         return render(request, 'nieuwApp/gekozenNieuw.html', {
+        #             'error_message': 'Oeps, er is iets mis gegaan. Check je inputs en probeer het aub opnieuw.',
+        #             'gekozen_type': oude_type,
+        #             'passed_bestelnr': bestelnr,
+        #             'passed_email': email,
+        #             'products_list': prod_list,
+        #             'form': form
+        #         })
         
-        elif oude_type == 'formaat':
-            form = FormaatForm(request.POST)
+        elif oude_type == 'dryaged':
+            form = DryAgedForm(request.POST)
             if form.is_valid():
                 data = form.cleaned_data
-                Formaat(data['product'], data['cat'], data['formaat'], data['aantal'], data['bijz']).insert(bestelnr)
-            else:
-                return render(request, 'nieuwApp/gekozenNieuw.html', {
-                    'error_message': 'Oeps, er is iets mis gegaan. Check je inputs en probeer het aub opnieuw.',
-                    'gekozen_type': oude_type,
-                    'passed_bestelnr': bestelnr,
-                    'passed_email': email,
-                    'products_list': prod_list,
-                    'form': form
-                })
-        
-        elif oude_type == 'bron':
-            form = BronVleesForm(request.POST)
-            if form.is_valid():
-                data = form.cleaned_data
-                BronVlees(data['product'], data['cat'], data['bron'], data['aantal'], data['bijz']).insert(bestelnr)
+                DryAgedVlees(data['product'], data['soort'], data['gewicht'], data['bijz']).insert(bestelnr)
             else:
                 return render(request, 'nieuwApp/gekozenNieuw.html', {
                     'error_message': 'Oeps, er is iets mis gegaan. Check je inputs en probeer het aub opnieuw.',

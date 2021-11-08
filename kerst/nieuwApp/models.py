@@ -1,11 +1,12 @@
 from django.db import models
 import pprint
 
-TYPES = ['snijdvlees', 'menu', 'gourmet','formaat', 'bronvlees']
+TYPES = ['snijdvlees', 'menu', 'gourmet', 'dryagedvlees', 'standaard']
 
 from utils import get_db
 kerst_db = get_db('kerst_db')
 bests = kerst_db['bestellingen']
+prods = kerst_db['producten']
 
 class Snijdvlees:
     def __init__(self, product, cat, gewicht, snijden, bijz):
@@ -23,11 +24,22 @@ class Snijdvlees:
             'snijden': self.snijden,
         }
 
+        incs = {'gewicht': self.gewicht}
+
+        for key, value in self.snijden.items():
+            nieuw_key = 'snijden.' + key
+            incs[nieuw_key] = value
+        
         if self.bijz:
             new_doc['bijz'] = self.bijz
-
+            prods.update_one({'product': self.product}, {'$inc': incs, '$set': {'bijz.' + str(bestelnr): self.bijz}}, upsert=True)
+        else:
+            prods.update_one({'product': self.product}, {'$inc': incs}, upsert=True)
+        
         bests.update_one({'bestelnr': bestelnr}, {"$push" : {"producten" : new_doc}})
 
+        
+        
 class Menu:
     def __init__(self, product, cat, aantal, voorgerecht, hoofdgerecht, dessert, bijz):
         self.product = product
@@ -53,6 +65,34 @@ class Menu:
 
         bests.update_one({'bestelnr': bestelnr}, {"$push" : {"producten" : new_doc}})
 
+        incs = {'aantal': self.aantal}
+
+        for key, value in self.voorgerecht.items():
+            nieuw_key = 'voorgerecht.' + key
+            incs[nieuw_key] = value
+
+        if self.product == 'traditioneel_kerstmenu':
+            incs['hoofdgerecht.beef_wellington'] = self.aantal
+            incs['dessert.dessert_buffet'] = self.aantal
+
+            if self.bijz:
+                prods.update_one({'product': self.product}, {'$inc': incs, '$set': {'bijz.' + str(bestelnr): self.bijz}}, upsert=True)
+            else:
+                prods.update_one({'product': self.product}, {'$inc': incs}, upsert=True)
+        else:
+            for key, value in self.hoofdgerecht.items():
+                nieuw_key = 'hoofdgerecht.' + key
+                incs[nieuw_key] = value
+
+            for key, value in self.dessert.items():
+                nieuw_key = 'dessert.' + key
+                incs[nieuw_key] = value
+
+            if self.bijz:
+                prods.update_one({'product': self.product}, {'$inc': incs, '$set': {'bijz.' + str(bestelnr): self.bijz}}, upsert=True)
+            else:
+                prods.update_one({'product': self.product}, {'$inc': incs}, upsert=True)
+
 class Gourmet:
     def __init__(self, product, cat, conf, bijz):
         self.product = product
@@ -67,49 +107,68 @@ class Gourmet:
             'conf': self.conf,
         }
 
+        incs = {}
+
+        for key, value in self.conf.items():
+            nieuw_key = 'conf.' + key
+            incs[nieuw_key] = value
+        
         if self.bijz:
             new_doc['bijz'] = self.bijz
+            prods.update_one({'product': self.product}, {'$inc': incs, '$set': {'bijz.' + str(bestelnr): self.bijz}}, upsert=True)
+        else:
+            prods.update_one({'product': self.product}, {'$inc': incs}, upsert=True)
 
         bests.update_one({'bestelnr': bestelnr}, {"$push" : {"producten" : new_doc}})
 
-class Formaat:
-    def __init__(self, product, cat, formaat, aantal, bijz):
-        self.product = product
-        self.cat = cat
-        self.formaat = formaat
-        self.aantal = aantal
-        self.bijz = bijz
+        
+
+
+
+# class Formaat:
+#     def __init__(self, product, cat, formaat, bijz):
+#         self.product = product
+#         self.cat = cat
+#         self.formaat = formaat
+#         self.bijz = bijz
     
-    def insert(self, bestelnr):
-        new_doc = {
-            'product': self.product,
-            'cat': self.cat,
-            'formaat': self.formaat,
-            'aantal': self.aantal
-        }
+#     def insert(self, bestelnr):
+#         new_doc = {
+#             'product': self.product,
+#             'cat': self.cat,
+#             'formaat': self.formaat
+#         }
+        
+#         if self.bijz:
+#             new_doc['bijz'] = self.bijz
+#             prods.update_one({'product': self.product}, {'$inc': {self.formaat: 1}, '$set': {'bijz.' + str(bestelnr): self.bijz}}, upsert=True)
 
-        if self.bijz:
-            new_doc['bijz'] = self.bijz
+#         bests.update_one({'bestelnr': bestelnr}, {"$push" : {"producten" : new_doc}})
 
-        bests.update_one({'bestelnr': bestelnr}, {"$push" : {"producten" : new_doc}})
+#         prods.update_one({'product': self.product}, {'$inc': {self.formaat: 1}}, upsert=True)
 
-class BronVlees:
-    def __init__(self, product, bron, gewicht, bijz):
+class DryAgedVlees:
+    def __init__(self, product, soort, gewicht, bijz):
         self.product = product
-        self.bron = bron
+        self.soort = soort
         self.gewicht = gewicht
         self.bijz = bijz
     
     def insert(self, bestelnr):
         new_doc = {
             'product': self.product,
-            'bron': self.bron,
+            'soort': self.soort,
             'gewicht': self.gewicht,
         }
 
+        incs = {self.soort: self.gewicht}
+
         if self.bijz:
             new_doc['bijz'] = self.bijz
-
+            prods.update_one({'product': self.product}, {'$inc': incs, '$set': {'bijz.' + str(bestelnr): self.bijz}}, upsert=True)
+        else:
+            prods.update_one({'product': self.product}, {'$inc': incs}, upsert=True)
+        
         bests.update_one({'bestelnr': bestelnr}, {"$push" : {"producten" : new_doc}})
 
 class Standaard:
@@ -126,7 +185,12 @@ class Standaard:
             'aantal': self.aantal,
         }
 
+        incs = {'aantal': self.aantal}
+        
         if self.bijz:
             new_doc['bijz'] = self.bijz
-
+            prods.update_one({'product': self.product}, {'$inc': incs, '$set': {'bijz.' + str(bestelnr): self.bijz}}, upsert=True)
+        else:
+            prods.update_one({'product': self.product}, {'$inc': incs}, upsert=True)
+        
         bests.update_one({'bestelnr': bestelnr}, {"$push" : {"producten" : new_doc}})

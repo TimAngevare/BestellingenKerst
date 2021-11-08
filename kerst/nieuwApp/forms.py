@@ -1,6 +1,7 @@
 from django.core.validators import RegexValidator
 snijd_validator = RegexValidator(r"(\d+:\d+,)+", "x aantal keer: (gewicht):(aantal),")
 telnr_validator = RegexValidator(r"^\+316\d{8}$", "Moet beginnen met: +316")
+tijdophalen_validator = RegexValidator(r"^\d{2}:\d{2}$", "format: 00:00")
 
 from django import forms
 from django.utils.safestring import mark_safe
@@ -10,14 +11,13 @@ TYPE_OPTION = (
     ("snijdvlees", "Snijdbaar vlees"),
     ("menu", "Menu"),
     ("gourmet", "Gourmet"),
-    ("formaat", "Bepaald formaat"),
-    ("bronvlees", "Speciaalvlees"),
+    ("dryaged", "Dry Aged Vlees"),
 )
 
-FORMAAT_OPTION = (
-    ('klein', 'Klein'),
-    ('groot', 'Groot'),
-)
+# FORMAAT_OPTION = (
+#     ('klein', 'Klein'),
+#     ('groot', 'Groot'),
+# )
 
 DAGEN_OPHALEN_OPTION = [
     ('23', '23-12'),
@@ -25,9 +25,26 @@ DAGEN_OPHALEN_OPTION = [
     ('25', '25-12')
 ]
 
+# FORMAAT_PROD_OPTION = (
+#     ('de_tapas_plank', 'De Tapas Plank'),
+#     ('de_party_pan', 'De Party Pan'),
+# )
+
 MENU_OPTION = (
     ('dorpsslagers_kerstmenu', 'Het Dorpsslagers Kerstmenu'),
     ('traditioneel_kerstmenu', 'Het Traditioneel Kerstmenu'),
+)
+
+SOORT_OPTION = (
+    ('ribeye', 'Ribeye'),
+    ('entrecote', 'Entrecote'),
+    ('cote_a_los', "Cote a L'os"),
+)
+
+DRYAGED_OPTION = (
+    ('blonde_aquitaine', 'Blonde Aquitaine'),
+    ('france_limousine', 'France Limousin'),
+    ('spaanse_rubia_gallega', 'Spaanse Rubia Gallega'),
 )
 
 def standaard_aantal(prod_label):
@@ -43,11 +60,12 @@ temp_gewicht = forms.IntegerField(label="Gewicht", min_value=0, widget=forms.Num
 class NieuweBestellingForm(forms.Form):
     prod_type = temp_prod_type
     usr_email = forms.EmailField(label="E-mail adres", max_length=100, widget=forms.EmailInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
+    dagophalen = forms.ChoiceField(label="Dag ophalen", choices=DAGEN_OPHALEN_OPTION, widget=forms.RadioSelect())
 
 class BestellingAfmakenForm(forms.Form):
     naam = forms.CharField(label="Naam", max_length=150, widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
     telnr = forms.CharField(label="Telefoon nummer", max_length=12, validators=[telnr_validator], widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'value': '+316'}))
-    dagophalen = forms.ChoiceField(label="Dag ophalen", choices=DAGEN_OPHALEN_OPTION, widget=forms.RadioSelect())
+    tijdophalen = forms.CharField(label="Tijd ophalen", max_length=5, validators=[tijdophalen_validator], widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
 
 class SnijdForm(forms.Form):
     product = temp_product
@@ -101,19 +119,18 @@ class GourmetForm(forms.Form):
     bijz = temp_bijz
     prod_type = temp_prod_type
 
-class FormaatForm(forms.Form):
-    product = temp_product
-    cat = temp_cat
-    formaat = forms.ChoiceField(label="Formaat", choices=FORMAAT_OPTION, widget=forms.Select(attrs={'class': 'w3-select'}))
-    aantal = temp_aantal
-    
-    bijz = temp_bijz
-    prod_type = temp_prod_type
 
-class BronVleesForm(forms.Form):
-    product = temp_product
-    cat = temp_cat
-    bron = forms.CharField(label="Bron", max_length=100, widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
+# class FormaatForm(forms.Form):
+#     product = forms.ChoiceField(label="Product", choices=FORMAAT_PROD_OPTION, widget=forms.Select(attrs={'class': 'w3-select'}))
+#     cat = temp_cat
+#     formaat = forms.ChoiceField(label="Formaat", choices=FORMAAT_OPTION, widget=forms.Select(attrs={'class': 'w3-select'}))
+    
+#     bijz = temp_bijz
+#     prod_type = temp_prod_type
+
+class DryAgedForm(forms.Form):
+    product = forms.ChoiceField(label="Product", choices=DRYAGED_OPTION, widget=forms.Select(attrs={'class': 'w3-select'}))
+    soort = forms.ChoiceField(label="Soort", choices=SOORT_OPTION, widget=forms.Select(attrs={'class': 'w3-select'}))
     gewicht = temp_gewicht
     
     bijz = temp_bijz
