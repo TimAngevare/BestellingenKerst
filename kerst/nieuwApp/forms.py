@@ -3,6 +3,7 @@ snijd_validator = RegexValidator(r"(\d+:\d+,)+", "x aantal keer: (gewicht):(aant
 telnr_validator = RegexValidator(r"^\+316\d{8}$", "Moet beginnen met: +316")
 
 from django import forms
+from django.utils.safestring import mark_safe
 
 TYPE_OPTION = (
     ("standaard", "Standaard"),
@@ -24,10 +25,18 @@ DAGEN_OPHALEN_OPTION = [
     ('25', '25-12')
 ]
 
+MENU_OPTION = (
+    ('dorpsslagers_kerstmenu', 'Het Dorpsslagers Kerstmenu'),
+    ('traditioneel_kerstmenu', 'Het Traditioneel Kerstmenu'),
+)
+
+def standaard_aantal(prod_label):
+    return forms.IntegerField(label=mark_safe(prod_label), min_value=0, widget=forms.NumberInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'value': '0'}))
+
 temp_product = forms.CharField(label="Product", max_length=100, widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'list': 'products'}))
 temp_cat = forms.CharField(label="Categorie", max_length=100, widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
 temp_bijz = forms.CharField(label="Bijzonderheden", max_length=200, required=False, widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
-temp_prod_type = forms.ChoiceField(label="Type product", choices=TYPE_OPTION, widget=forms.Select(attrs={'class': 'w3-select'}))
+temp_prod_type = forms.ChoiceField(label=mark_safe("<br />Type volgende product"), choices=TYPE_OPTION, widget=forms.Select(attrs={'class': 'w3-select'}))
 temp_aantal = forms.IntegerField(label="Aantal", min_value=1, widget=forms.NumberInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
 temp_gewicht = forms.IntegerField(label="Gewicht", min_value=0, widget=forms.NumberInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
 
@@ -50,24 +59,44 @@ class SnijdForm(forms.Form):
     prod_type = temp_prod_type
 
 class MenuForm(forms.Form):
-    product = temp_product
+    product = forms.ChoiceField(label="Product", choices=MENU_OPTION, widget=forms.Select(attrs={'class': 'w3-select'}))
     cat = temp_cat
     aantal = temp_aantal
 
-    carpaccio = forms.IntegerField(label="(V-gerecht) Carpaccio", min_value=0, widget=forms.NumberInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'value': '0'}))
-    vitello_tonato = forms.IntegerField(label="(V-gerecht) Vitello tonato", min_value=0, widget=forms.NumberInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'value': '0'}))
-    kalfsragout = forms.IntegerField(label="(V-gerecht) Kalfsragout", min_value=0, widget=forms.NumberInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'value': '0'}))
-    biefstuk = forms.IntegerField(label="(H-gerecht) Biefstuk", min_value=0, widget=forms.NumberInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'value': '0'}))
-    varkenshaas = forms.IntegerField(label="(H-gerecht) Varkenshaas", min_value=0, widget=forms.NumberInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'value': '0'}))
-    tiramisu = forms.IntegerField(label="(Dessert) Tiramisu", min_value=0, widget=forms.NumberInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'value': '0'}))
-    apfelstrudel = forms.IntegerField(label="(Dessert) Apfelstrudel", min_value=0, widget=forms.NumberInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'value': '0'}))
+    carpaccio = standaard_aantal("<br />(V-gerecht) Carpaccio")
+    vitello_tonato = standaard_aantal("(V-gerecht) Vitello tonato")
+    kalfsragout = standaard_aantal("(V-gerecht) Kalfsragout")
+    biefstuk = standaard_aantal("(H-gerecht) Biefstuk")
+    varkenshaas = standaard_aantal("(H-gerecht) Varkenshaas")
+    tiramisu = standaard_aantal("(Dessert) Tiramisu")
+    apfelstrudel = standaard_aantal("(Dessert) Apfelstrudel")
 
     bijz = temp_bijz
     prod_type = temp_prod_type
 
 class GourmetForm(forms.Form):
-    product = temp_product
     cat = temp_cat
+
+    bavette = standaard_aantal("<br />Bavette")
+    kogel_biefstuk = standaard_aantal("Kogel Biefstuk")
+    ossenhaaspuntjes = standaard_aantal("Ossenhaaspuntjes")
+    ba_hamburgers = standaard_aantal("Black Angus Hamburgers")
+    rundervink = standaard_aantal("Rundervink")
+    speklapjes = standaard_aantal("Speklapjes")
+    varkenshaassate = standaard_aantal("Varkenshaassate")
+    shoarma = standaard_aantal("Shoarma")
+    varkenshaas = standaard_aantal("Varkenshaas")
+    kip_bacon_chili = standaard_aantal("Kip Bacon Chili")
+    slavink = standaard_aantal("Slavink")
+    kipfilet = standaard_aantal("Kipfilet")
+    hamburger = standaard_aantal("Hamburger")
+    lamsrack = standaard_aantal("Lamsrack")
+    dry_aged = standaard_aantal("Dry Aged")
+    kalfsoester = standaard_aantal("Kalfsoester")
+    diamanthaas = standaard_aantal("Diamanthaas")
+    ba_cheddar = standaard_aantal("Black Angus Cheddar")
+    chipolata = standaard_aantal("Chipolata")
+    chinese_roaststeak = standaard_aantal("Chinese Roaststeak")
     
     bijz = temp_bijz
     prod_type = temp_prod_type

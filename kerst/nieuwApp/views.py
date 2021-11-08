@@ -70,28 +70,6 @@ def nieuw_bestel(request):
     else:
         return HttpResponse("Wejow gek dit kan niet zomaar he.")
 
-def nieuw_entry(request, bestelnr, email):
-    try:
-        gekozen_type = request.POST['prod_type']
-    except (KeyError):
-        return render(request, 'nieuwApp/gekozenNieuw.html', {
-            'error_message': "Je hebt geen type gekozen. Je hebt automatisch het formulier voor snijdbaar vlees gekregen.",
-            'gekozen_type': 'snijdvlees',
-            'passed_bestelnr': bestelnr,
-            'passed_email': email,
-            'products_list': prod_list,
-            'form': SnijdForm()
-        })
-    else:
-        form_info = kies_form(gekozen_type)
-        return render(request, 'nieuwApp/gekozenNieuw.html', {
-            'gekozen_type': gekozen_type,
-            'passed_bestelnr': bestelnr,
-            'passed_email': email,
-            'products_list': form_info[1],
-            'form': form_info[0]
-        })
-
 def bestel_done(request):
     if request.method == 'POST':
         form = BestellingAfmakenForm(request.POST)
@@ -135,14 +113,6 @@ def bestel_done(request):
     else:
         return HttpResponse("ja dit kan dus weer niet he")
 
-def bestel_pre_finish(request, bestelnr, email):
-    
-    return render(request, 'nieuwApp/bestellingAfmaken.html', {
-        'passed_bestelnr': bestelnr,
-        'passed_email': email,
-        'form': BestellingAfmakenForm()
-    })
-
 def nieuw_keuze(request):
     if request.method == 'POST':
         bestelnr = int(request.POST['bestelnr'])
@@ -153,6 +123,7 @@ def nieuw_keuze(request):
         
         email = request.POST['usr_email']
         oude_type = request.POST['huidig_type']
+        nieuw_type = request.POST['prod_type']
 
         if oude_type == 'snijdvlees':
             form = SnijdForm(request.POST)
@@ -181,10 +152,10 @@ def nieuw_keuze(request):
         
         elif oude_type == 'menu':
             form = MenuForm(request.POST)
-            if form.is_valid() and request.POST['product'] in ['dorpsslagers kerstmenu', 'traditioneel kerstmenu']:
+            if form.is_valid():
                 data = form.cleaned_data
 
-                if data['product'] == 'traditioneel kerstmenu':
+                if data['product'] == 'traditioneel_kerstmenu':
                     v_gerecht_doc = {}
 
                     int_carp = int(data['carpaccio'])
@@ -194,7 +165,7 @@ def nieuw_keuze(request):
                     if int_ragout > 0:
                         v_gerecht_doc['kalfsragout'] = int_ragout
 
-                    Menu('traditioneel kerstmenu', data['cat'], int(data['aantal']), v_gerecht_doc, 'beef wellington', 'dessert buffet', data['bijz']).insert(bestelnr)
+                    Menu('traditioneel_kerstmenu', data['cat'], int(data['aantal']), v_gerecht_doc, 'beef wellington', 'dessert buffet', data['bijz']).insert(bestelnr)
                 else:
                     v_gerecht_doc = {}
                     h_gerecht_doc = {}
@@ -207,18 +178,12 @@ def nieuw_keuze(request):
                     int_tiramisu = int(data['tiramisu'])
                     int_apfelstrudel= int(data['apfelstrudel'])
 
-                    if int_carp > 0:
-                        v_gerecht_doc['carpaccio'] = int_carp
-                    if int_vt > 0:
-                        v_gerecht_doc['vitello_tonato'] = int_vt
-                    if int_biefstuk> 0:
-                        h_gerecht_doc['biefstuk'] = int_biefstuk
-                    if int_varkenshaas > 0:
-                        h_gerecht_doc['varkenshaas'] = int_varkenshaas
-                    if int_tiramisu > 0:
-                        dessert_doc['tiramisu'] = int_tiramisu
-                    if int_apfelstrudel > 0:
-                        dessert_doc['apfelstrudel'] = int_apfelstrudel
+                    if int_carp > 0: v_gerecht_doc['carpaccio'] = int_carp
+                    if int_vt > 0: v_gerecht_doc['vitello_tonato'] = int_vt
+                    if int_biefstuk> 0: h_gerecht_doc['biefstuk'] = int_biefstuk
+                    if int_varkenshaas > 0: h_gerecht_doc['varkenshaas'] = int_varkenshaas
+                    if int_tiramisu > 0: dessert_doc['tiramisu'] = int_tiramisu
+                    if int_apfelstrudel > 0: dessert_doc['apfelstrudel'] = int_apfelstrudel
 
                     
                     Menu('dorpsslagers kerstmenu', data['cat'], int(data['aantal']), v_gerecht_doc, h_gerecht_doc, dessert_doc, data['bijz']).insert(bestelnr)
@@ -238,15 +203,22 @@ def nieuw_keuze(request):
             form = GourmetForm(request.POST)
             if form.is_valid():
                 data = form.cleaned_data
-                Gourmet(data['product'], data['cat'], data['conf'], data['bijz']).insert(bestelnr)
+                conf_doc = {}
+                menu_items = ['bavette', 'kogel_biefstuk', 'ossenhaaspuntjes', 'ba_hamburgers', 'rundervink', 'speklapjes', 'varkenshaassate', 'shoarma', 'varkenshaas', 'kip_bacon_chili', 'slavink', 'kipfilet', 'hamburger', 'lamsrack', 'dry_aged', 'kalfsoester', 'diamanthaas', 'ba_cheddar', 'chipolata', 'chinese_roaststeak']
+
+                for optie in menu_items:
+                    int_optie = int(data[optie])
+                    if int_optie > 0: conf_doc[optie] = int_optie
+                
+                Gourmet('custom_gourmet', data['cat'], conf_doc, data['bijz']).insert(bestelnr)
             else:
                 return render(request, 'nieuwApp/gekozenNieuw.html', {
-                    'error_message': 'Oeps, er is iets mis gegaan. Probeer het aub opnieuw',
+                    'error_message': 'Oeps, er is iets mis gegaan. Check je inputs en probeer het aub opnieuw.',
                     'gekozen_type': oude_type,
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
                     'products_list': prod_list,
-                    'form': GourmetForm()
+                    'form': form
                 })
 
         
@@ -257,12 +229,12 @@ def nieuw_keuze(request):
                 Formaat(data['product'], data['cat'], data['formaat'], data['aantal'], data['bijz']).insert(bestelnr)
             else:
                 return render(request, 'nieuwApp/gekozenNieuw.html', {
-                    'error_message': 'Oeps, er is iets mis gegaan. Probeer het aub opnieuw',
+                    'error_message': 'Oeps, er is iets mis gegaan. Check je inputs en probeer het aub opnieuw.',
                     'gekozen_type': oude_type,
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
                     'products_list': prod_list,
-                    'form': FormaatForm()
+                    'form': form
                 })
         
         elif oude_type == 'bron':
@@ -272,12 +244,12 @@ def nieuw_keuze(request):
                 BronVlees(data['product'], data['cat'], data['bron'], data['aantal'], data['bijz']).insert(bestelnr)
             else:
                 return render(request, 'nieuwApp/gekozenNieuw.html', {
-                    'error_message': 'Oeps, er is iets mis gegaan. Probeer het aub opnieuw',
+                    'error_message': 'Oeps, er is iets mis gegaan. Check je inputs en probeer het aub opnieuw.',
                     'gekozen_type': oude_type,
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
                     'products_list': prod_list,
-                    'form': BronVleesForm()
+                    'form': form
                 })
         
         elif oude_type == 'standaard':
@@ -288,19 +260,30 @@ def nieuw_keuze(request):
                 Standaard(data['product'], data['cat'], data['aantal'], data['bijz']).insert(bestelnr)
             else:
                 return render(request, 'nieuwApp/gekozenNieuw.html', {
-                    'error_message': 'Oeps, er is iets mis gegaan. Probeer het aub opnieuw',
+                    'error_message': 'Oeps, er is iets mis gegaan. Check je inputs en probeer het aub opnieuw.',
                     'gekozen_type': oude_type,
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
                     'products_list': prod_list,
-                    'form': StandaardForm()
+                    'form': form
                 })
         
 
         if request.POST['done'] == 'Klaar':
-            return(bestel_pre_finish(request, bestelnr, email))
+            return render(request, 'nieuwApp/bestellingAfmaken.html', {
+                'passed_bestelnr': bestelnr,
+                'passed_email': email,
+                'form': BestellingAfmakenForm()
+            })
         else:
-            return(nieuw_entry(request, bestelnr, email))
+            form_info = kies_form(nieuw_type)
+            return render(request, 'nieuwApp/gekozenNieuw.html', {
+                'gekozen_type': nieuw_type,
+                'passed_bestelnr': bestelnr,
+                'passed_email': email,
+                'products_list': form_info[1],
+                'form': form_info[0]
+            })
 
     else:
         return HttpResponse("kk djalla dit moet niet kunnen ga naar home ofzo")
