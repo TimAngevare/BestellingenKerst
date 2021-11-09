@@ -1,6 +1,7 @@
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.contrib import messages
 
 import datetime
 
@@ -83,7 +84,8 @@ def nieuw_bestel(request):
                 'products_list': form_info[1],
                 'form': form_info[0]
             })
-        
+        else:
+            messages.error(request, "niet alles ingevuld")
         return render(request, 'nieuwApp/nieuw.html', {
             'form': form
         })

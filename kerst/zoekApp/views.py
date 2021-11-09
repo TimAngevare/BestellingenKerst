@@ -1,7 +1,9 @@
 from django.shortcuts import render
+from . import forms
 
 def zoek(request):
-    return render(request, 'zoekApp/zoek.html', {})
+    bestel_form = forms.Bestellingen()
+    return render(request, 'zoekApp/zoek.html', {"bestel_form":bestel_form})
 
 def bestellingen(request):
     pass
