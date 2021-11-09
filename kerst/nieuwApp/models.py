@@ -1,5 +1,4 @@
 from django.db import models
-import pprint
 
 TYPES = ['snijdvlees', 'menu', 'gourmet', 'dryagedvlees', 'standaard']
 
@@ -9,9 +8,8 @@ bests = kerst_db['bestellingen']
 prods = kerst_db['producten']
 
 class Snijdvlees:
-    def __init__(self, product, cat, gewicht, snijden, bijz):
+    def __init__(self, product, gewicht, snijden, bijz):
         self.product = product
-        self.cat = cat
         self.gewicht = gewicht
         self.snijden = snijden
         self.bijz = bijz
@@ -19,7 +17,6 @@ class Snijdvlees:
     def insert(self, bestelnr):
         new_doc = {
             'product': self.product,
-            'cat': self.cat,
             'gewicht': self.gewicht,
             'snijden': self.snijden,
         }
@@ -41,9 +38,8 @@ class Snijdvlees:
         
         
 class Menu:
-    def __init__(self, product, cat, aantal, voorgerecht, hoofdgerecht, dessert, bijz):
+    def __init__(self, product, aantal, voorgerecht, hoofdgerecht, dessert, bijz):
         self.product = product
-        self.cat = cat
         self.aantal = aantal
         self.voorgerecht = voorgerecht
         self.hoofdgerecht = hoofdgerecht
@@ -53,7 +49,6 @@ class Menu:
     def insert(self, bestelnr):
         new_doc = {
             'product': self.product,
-            'cat': self.cat,
             'aantal': self.aantal,
             'voorgerecht': self.voorgerecht,
             'hoofdgerecht': self.hoofdgerecht,
@@ -94,16 +89,14 @@ class Menu:
                 prods.update_one({'product': self.product}, {'$inc': incs}, upsert=True)
 
 class Gourmet:
-    def __init__(self, product, cat, conf, bijz):
+    def __init__(self, product, conf, bijz):
         self.product = product
-        self.cat = cat
         self.conf = conf
         self.bijz = bijz
     
     def insert(self, bestelnr):
         new_doc = {
             'product': self.product,
-            'cat': self.cat,
             'conf': self.conf,
         }
 
@@ -126,16 +119,14 @@ class Gourmet:
 
 
 # class Formaat:
-#     def __init__(self, product, cat, formaat, bijz):
+#     def __init__(self, product, formaat, bijz):
 #         self.product = product
-#         self.cat = cat
 #         self.formaat = formaat
 #         self.bijz = bijz
     
 #     def insert(self, bestelnr):
 #         new_doc = {
 #             'product': self.product,
-#             'cat': self.cat,
 #             'formaat': self.formaat
 #         }
         
@@ -172,16 +163,14 @@ class DryAgedVlees:
         bests.update_one({'bestelnr': bestelnr}, {"$push" : {"producten" : new_doc}})
 
 class Standaard:
-    def __init__(self, product, cat, aantal, bijz):
+    def __init__(self, product, aantal, bijz):
         self.product = product
-        self.cat = cat
         self.aantal = aantal
         self.bijz = bijz
     
     def insert(self, bestelnr):
         new_doc = {
             'product': self.product,
-            'cat': self.cat,
             'aantal': self.aantal,
         }
 

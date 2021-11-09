@@ -51,7 +51,6 @@ def standaard_aantal(prod_label):
     return forms.IntegerField(label=mark_safe(prod_label), min_value=0, widget=forms.NumberInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'value': '0'}))
 
 temp_product = forms.CharField(label="Product", max_length=100, widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey', 'list': 'products'}))
-temp_cat = forms.CharField(label="Categorie", max_length=100, widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
 temp_bijz = forms.CharField(label="Bijzonderheden", max_length=200, required=False, widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
 temp_prod_type = forms.ChoiceField(label=mark_safe("<br />Type volgende product"), choices=TYPE_OPTION, widget=forms.Select(attrs={'class': 'w3-select'}))
 temp_aantal = forms.IntegerField(label="Aantal", min_value=1, widget=forms.NumberInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
@@ -69,7 +68,6 @@ class BestellingAfmakenForm(forms.Form):
 
 class SnijdForm(forms.Form):
     product = temp_product
-    cat = temp_cat
     gewicht = temp_gewicht
     snijden = forms.CharField(label="Snijden", max_length=100, validators=[snijd_validator], widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
     
@@ -78,7 +76,6 @@ class SnijdForm(forms.Form):
 
 class MenuForm(forms.Form):
     product = forms.ChoiceField(label="Product", choices=MENU_OPTION, widget=forms.Select(attrs={'class': 'w3-select'}))
-    cat = temp_cat
     aantal = temp_aantal
 
     carpaccio = standaard_aantal("<br />(V-gerecht) Carpaccio")
@@ -93,8 +90,6 @@ class MenuForm(forms.Form):
     prod_type = temp_prod_type
 
 class GourmetForm(forms.Form):
-    cat = temp_cat
-
     bavette = standaard_aantal("<br />Bavette")
     kogel_biefstuk = standaard_aantal("Kogel Biefstuk")
     ossenhaaspuntjes = standaard_aantal("Ossenhaaspuntjes")
@@ -138,7 +133,6 @@ class DryAgedForm(forms.Form):
 
 class StandaardForm(forms.Form):
     product = temp_product
-    cat = temp_cat
     aantal = temp_aantal
     
     bijz = temp_bijz
