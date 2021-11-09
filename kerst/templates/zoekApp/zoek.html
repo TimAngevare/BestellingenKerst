@@ -1,18 +1,13 @@
 {% extends 'main.html' %}
 
 {% block content %}
+
 <div class="w3-display-middle">
-    <button>Laat alle bestellingen zien</button>
-    <hr><br>
-    <h1>Zoek bestellingen</h1>
-    <hr>
-    <h2>Filter</h2>
-    {{bestel_form}}
-    <h1>Zoek producten</h1>
-    <hr>
-    <h2>Filter</h2>
+    <div class="w3-container" style="margin-top: 10%; text-align: center;">
+        <a href="/zoek/alles/"><button style="padding: 100px; min-width: 40%;" class="w3-button w3-indigo w3-round w3-xlarge">Zie alles</button></a>
+        <a href="/zoek/bestellingen/"><button style="padding: 100px; min-width: 40%;" class="w3-button w3-blue-grey w3-round w3-xlarge">bestellingen</button></a>
+        <a href="/zoek/producten/"><button style="padding: 100px; min-width: 40%;" class="w3-button w3-light-blue w3-round w3-xlarge">Producten</button></a>
+    </div>  
 </div>
-
-
 
 {% endblock content %}

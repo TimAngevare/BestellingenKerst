@@ -1,0 +1,17 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="w3-display-middle">
+    <h1>Zoek bestellingen</h1>
+    <hr>
+    <h2>Filter</h2>
+    <form method="post" action="/">
+        {{bestel_form}}
+        <button type="submit", name="save">Zoek</button>
+    </form>
+</div>
+
+
+
+
+{% endblock content %}
