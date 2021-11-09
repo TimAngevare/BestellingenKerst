@@ -96,9 +96,9 @@ def bestel_done(request):
 
         if form.is_valid():
             data = form.cleaned_data
-            bestelnr = data['bestelnr']
+            bestelnr = request.POST['bestelnr']
 
-            bests.update_one({'bestelnr': int(request.POST['bestelnr'])},{"$set": {"bestelnr": bestelnr, "email" : request.POST['usr_email'], "naam" : data['naam'], "telnr" : data['telnr'], "dagophalen" : bestelnr[:2], "tijdophalen" : int(data['tijdophalen']), "besteltijd" : datetime.datetime.utcnow()}})
+            bests.update_one({'bestelnr': int(bestelnr)},{"$set": {"email" : request.POST['usr_email'], "naam" : data['naam'], "telnr" : data['telnr'], "dagophalen" : bestelnr[:2], "tijdophalen" : int(data['tijdophalen']), "besteltijd" : datetime.datetime.utcnow()}})
 
             return HttpResponseRedirect('/')
         else:
@@ -137,7 +137,7 @@ def nieuw_keuze(request):
                     snijdvalue = snijdoptie.split(':')
                     snijd_obj[snijdvalue[0]] = int(snijdvalue[1])
                 
-                Snijdvlees(data['product'], data['cat'], int(data['gewicht']), snijd_obj, data['bijz']).insert(bestelnr)
+                Snijdvlees(data['product'], int(data['gewicht']), snijd_obj, data['bijz']).insert(bestelnr)
             else:
                 return render(request, 'nieuwApp/gekozenNieuw.html', {
                     'error_message': 'Oeps er is iets mis, waarschijnlijk heb je snijden niet correct ingevoerd. De correcte manier is (zovaak als je wil): (gewicht):(aantal),',
@@ -163,7 +163,7 @@ def nieuw_keuze(request):
                     if int_ragout > 0:
                         v_gerecht_doc['kalfsragout'] = int_ragout
 
-                    Menu('traditioneel_kerstmenu', data['cat'], int(data['aantal']), v_gerecht_doc, 'beef wellington', 'dessert buffet', data['bijz']).insert(bestelnr)
+                    Menu('traditioneel_kerstmenu', int(data['aantal']), v_gerecht_doc, 'beef wellington', 'dessert buffet', data['bijz']).insert(bestelnr)
                 else:
                     v_gerecht_doc = {}
                     h_gerecht_doc = {}
@@ -184,7 +184,7 @@ def nieuw_keuze(request):
                     if int_apfelstrudel > 0: dessert_doc['apfelstrudel'] = int_apfelstrudel
 
                     
-                    Menu('dorpsslagers_kerstmenu', data['cat'], int(data['aantal']), v_gerecht_doc, h_gerecht_doc, dessert_doc, data['bijz']).insert(bestelnr)
+                    Menu('dorpsslagers_kerstmenu', int(data['aantal']), v_gerecht_doc, h_gerecht_doc, dessert_doc, data['bijz']).insert(bestelnr)
  
             else:
                 return render(request, 'nieuwApp/gekozenNieuw.html', {
@@ -208,7 +208,7 @@ def nieuw_keuze(request):
                     int_optie = int(data[optie])
                     if int_optie > 0: conf_doc[optie] = int_optie
                 
-                Gourmet('custom_gourmet', data['cat'], conf_doc, data['bijz']).insert(bestelnr)
+                Gourmet('custom_gourmet', conf_doc, data['bijz']).insert(bestelnr)
             else:
                 return render(request, 'nieuwApp/gekozenNieuw.html', {
                     'error_message': 'Oeps, er is iets mis gegaan. Check je inputs en probeer het aub opnieuw.',
@@ -223,7 +223,7 @@ def nieuw_keuze(request):
         #     form = FormaatForm(request.POST)
         #     if form.is_valid():
         #         data = form.cleaned_data
-        #         Formaat(data['product'], data['cat'], data['formaat'], data['bijz']).insert(bestelnr)
+        #         Formaat(data['product'], data['formaat'], data['bijz']).insert(bestelnr)
         #     else:
         #         return render(request, 'nieuwApp/gekozenNieuw.html', {
         #             'error_message': 'Oeps, er is iets mis gegaan. Check je inputs en probeer het aub opnieuw.',
@@ -253,8 +253,7 @@ def nieuw_keuze(request):
             form = StandaardForm(request.POST)
             if form.is_valid():
                 data = form.cleaned_data
-                print(data['cat'])
-                Standaard(data['product'], data['cat'], data['aantal'], data['bijz']).insert(bestelnr)
+                Standaard(data['product'], data['aantal'], data['bijz']).insert(bestelnr)
             else:
                 return render(request, 'nieuwApp/gekozenNieuw.html', {
                     'error_message': 'Oeps, er is iets mis gegaan. Check je inputs en probeer het aub opnieuw.',
