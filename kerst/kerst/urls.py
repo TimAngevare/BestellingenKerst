@@ -20,6 +20,6 @@ from nieuwApp.views import index
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('nieuw/', include('nieuwApp.urls')),
-    #path('zoek/', include('zoekApp.urls')),
+    path('zoek/', include('zoekApp.urls')),
     path('', index),
 ]
