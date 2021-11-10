@@ -32,7 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'nieuwApp.apps.NieuwappConfig',
-    #'zoekApp.apps.ZoekappConfig',
+    'zoekApp.apps.ZoekappConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
