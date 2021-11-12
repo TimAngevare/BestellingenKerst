@@ -15,22 +15,21 @@ def verwijder_best():
         print("Het gaat helemaal mis, het is niet gelukt.")
 def zoek_best(num, tel, dag):
     if num != '' and tel != '' and dag != '':
-        resultaten = bests.find({'bestelnr' : int(num), 'dagophalen' : dag, 'telnr': tel })
+        zoek_best.resultaten = bests.find({'bestelnr' : int(num), 'dagophalen' : dag, 'telnr': tel })
     elif num == '':
-        resultaten = bests.find({'dagophalen' : dag, 'telnr': tel })
+        zoek_best.resultaten = bests.find({'dagophalen' : dag, 'telnr': tel })
     elif tel == '':
-        resultaten = bests.find({'bestelnr' : int(num), 'dagophalen' : dag})
+        zoek_best.resultaten = bests.find({'bestelnr' : int(num), 'dagophalen' : dag})
     elif dag == '':
-        resultaten = bests.find({'bestelnr' : int(num), 'telnr': tel })
+        zoek_best.resultaten = bests.find({'bestelnr' : int(num), 'telnr': tel })
     elif num == '' and dag == '':
-        resultaten = bests.find({'telnr': tel })
+        zoek_best.resultaten = bests.find({'telnr': tel })
     elif num == '' and tel == '':
-        resultaten = bests.find({'dagophalen' : dag})
+        zoek_best.resultaten = bests.find({'dagophalen' : dag})
     elif dag == '' and tel == '':
-        resultaten = bests.find({'bestelnr' : int(num) })
+        zoek_best.resultaten = bests.find({'bestelnr' : int(num) })
     else:
-        resultaten = None
-    return resultaten
+        zoek_best.resultaten = 1
 
 def cat_toevoegen():
     obj_geen_cat = []
