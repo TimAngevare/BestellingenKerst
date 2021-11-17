@@ -8,6 +8,7 @@ import mongo_manage
 def zoek(request):
     return render(request, 'zoekApp/zoek.html')
 
+
 def bestellingen(request):
     if request.method == "POST":
         bestel_form = forms.Bestellingen(request.POST)
@@ -22,15 +23,17 @@ def bestellingen(request):
         return HttpResponse("zoekApp/bestellingen_results.html")
     else:
         bestel_form = forms.Bestellingen()
-    return render(request, 'zoekApp/bestellingen.html', {"bestel_form":bestel_form})
+    return render(request, 'zoekApp/bestellingen.html', {"bestel_form": bestel_form})
+
 
 def bestellingen_resultaten(request):
     resultaten = mongo_manage.zoek_best.resultaten
     return render(request, 'zoekApp/bestellingen.html', {"resultaten": resultaten})
 
+
 def producten(request):
     pass
 
+
 def alles(request):
     pass
-
