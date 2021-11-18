@@ -18,21 +18,21 @@ def verwijder_best():
 
 def zoek_best(num, tel, dag):
     if num != '' and tel != '' and dag != '':
-        zoek_best.resultaten = bests.find({'bestelnr': int(num), 'dagophalen': dag, 'telnr': tel})
+        resultaten = bests.find({'bestelnr': int(num), 'dagophalen': dag, 'telnr': tel})
     elif num == '' and dag == '':
-        zoek_best.resultaten = bests.find({'telnr': tel})
+        resultaten = bests.find({'telnr': tel})
     elif num == '' and tel == '':
-        zoek_best.resultaten = bests.find({'dagophalen': dag})
+        resultaten = bests.find({'dagophalen': dag})
     elif dag == '' and tel == '':
-        zoek_best.resultaten = bests.find({'bestelnr': int(num)})
+        resultaten = bests.find({'bestelnr': int(num)})
     elif num == '':
-        zoek_best.resultaten = bests.find({'dagophalen': dag, 'telnr': tel})
+        resultaten = bests.find({'dagophalen': dag, 'telnr': tel})
     elif tel == '':
-        zoek_best.resultaten = bests.find({'bestelnr': int(num), 'dagophalen': dag})
+        resultaten = bests.find({'bestelnr': int(num), 'dagophalen': dag})
     elif dag == '':
-        zoek_best.resultaten = bests.find({'bestelnr': int(num), 'telnr': tel})
+        resultaten = bests.find({'bestelnr': int(num), 'telnr': tel})
     else:
-        zoek_best.resultaten = 1
+        resultaten = 1
 
 
 def cat_toevoegen():
