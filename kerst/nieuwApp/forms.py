@@ -10,9 +10,9 @@ from django.utils.safestring import mark_safe
 TYPE_OPTION = (
     ("standaard", "Standaard"),
     ("snijdvlees", "Snijdbaar vlees"),
-    ("menu", "Menu"),
-    ("gourmet", "Gourmet"),
-    ("dryaged", "Dry Aged Vlees"),
+    ("menu", "Traditioneel Kerstmenu"),
+    ("zelf_gourmet", "Gourmet"),
+    ("dry_aged", "Dry Aged Vlees"),
 )
 
 # FORMAAT_OPTION = (
@@ -22,8 +22,7 @@ TYPE_OPTION = (
 
 DAGEN_OPHALEN_OPTION = [
     ('23', '23-12'),
-    ('24', '24-12'),
-    ('25', '25-12')
+    ('24', '24-12')
 ]
 
 # FORMAAT_PROD_OPTION = (
@@ -31,21 +30,28 @@ DAGEN_OPHALEN_OPTION = [
 #     ('de_party_pan', 'De Party Pan'),
 # )
 
-MENU_OPTION = (
-    ('dorpsslagers_kerstmenu', 'Het Dorpsslagers Kerstmenu'),
-    ('traditioneel_kerstmenu', 'Het Traditioneel Kerstmenu'),
-)
+# MENU_OPTION = (
+#     ('dorpsslagers kerstmenu', 'Het Dorpsslagers Kerstmenu'),
+#     ('traditioneel kerstmenu', 'Het Traditioneel Kerstmenu'),
+# )
 
 SOORT_OPTION = (
     ('ribeye', 'Ribeye'),
     ('entrecote', 'Entrecote'),
-    ('cote_a_los', "Cote a L'os"),
+    ('cote a los', "Cote a L'os"),
 )
 
 DRYAGED_OPTION = (
-    ('blonde_aquitaine', 'Blonde Aquitaine'),
-    ('france_limousine', 'France Limousin'),
-    ('spaanse_rubia_gallega', 'Spaanse Rubia Gallega'),
+    ('blonde aquitaine', 'Blonde Aquitaine'),
+    ('france limousin', 'France Limousin'),
+    ('spaanse rubia gallega', 'Spaanse Rubia Gallega'),
+    ('black angus', 'Black Angus'),
+    ('schotse aberdeen angus', 'Schotse Aberdeen Angus'),
+    ('friese holsteiner', 'Friese Holsteiner'),
+    ('west vlaams rood', 'West Vlaams Rood'),
+    ('simmentaler oostenrijk', 'Simmentaler Oostenrijk'),
+    ('australisch angus', 'Australisch Angus'),
+    ('spaans bavette', 'Spaans bavette'),
 )
 
 
@@ -124,17 +130,12 @@ class SnijdForm(forms.Form):
 
 
 class MenuForm(forms.Form):
-    product = forms.ChoiceField(label="Product", choices=MENU_OPTION, widget=forms.Select(attrs={'class': 'w3-select'}))
+    # product = forms.ChoiceField(label="Product", choices=MENU_OPTION, widget=forms.Select(attrs={'class': 'w3-select'}))
     aantal = temp_aantal
     # cat = "menu"
 
     carpaccio = standaard_aantal("<br />(V-gerecht) Carpaccio")
-    vitello_tonato = standaard_aantal("(V-gerecht) Vitello tonato")
     kalfsragout = standaard_aantal("(V-gerecht) Kalfsragout")
-    biefstuk = standaard_aantal("(H-gerecht) Biefstuk")
-    varkenshaas = standaard_aantal("(H-gerecht) Varkenshaas")
-    tiramisu = standaard_aantal("(Dessert) Tiramisu")
-    apfelstrudel = standaard_aantal("(Dessert) Apfelstrudel")
 
     bijz = temp_bijz
     prod_type = temp_prod_type
@@ -172,7 +173,7 @@ class DryAgedForm(forms.Form):
     product = forms.ChoiceField(label="Product", choices=DRYAGED_OPTION,
                                 widget=forms.Select(attrs={'class': 'w3-select'}))
     soort = forms.ChoiceField(label="Soort", choices=SOORT_OPTION, widget=forms.Select(attrs={'class': 'w3-select'}))
-    # cat = "dryaged"
+    # cat = "dry_aged"
     gewicht = temp_gewicht
 
     bijz = temp_bijz

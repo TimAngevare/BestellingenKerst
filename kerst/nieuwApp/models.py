@@ -1,7 +1,5 @@
 # from django.db import models
 
-# TYPES = ['snijdvlees', 'menu', 'gourmet', 'dryagedvlees', 'standaard']
-
 from utils import get_db
 
 kerst_db = get_db('kerst_db')
@@ -79,29 +77,21 @@ class Menu:
             nieuw_key = 'voorgerecht.' + key
             incs[nieuw_key] = value
 
-        if self.product == 'traditioneel_kerstmenu':
-            incs['hoofdgerecht.beef_wellington'] = self.aantal
-            incs['dessert.dessert_buffet'] = self.aantal
+        incs['hoofdgerecht.beef_wellington'] = self.aantal
+        incs['dessert.dessert_buffet'] = self.aantal
 
-            if self.bijz:
-                prods.update_one({'product': self.product},
-                                 {'$inc': incs, '$set': {'bijz.' + str(bestelnr): self.bijz}}, upsert=True)
-            else:
-                prods.update_one({'product': self.product}, {'$inc': incs}, upsert=True)
+        if self.bijz:
+            prods.update_one({'product': self.product},
+                             {'$inc': incs,
+                              '$set': {
+                                  'bijz.' + str(bestelnr): self.bijz,
+                                  'cat': 'menu'}},
+                             upsert=True)
         else:
-            for key, value in self.hoofdgerecht.items():
-                nieuw_key = 'hoofdgerecht.' + key
-                incs[nieuw_key] = value
-
-            for key, value in self.dessert.items():
-                nieuw_key = 'dessert.' + key
-                incs[nieuw_key] = value
-
-            if self.bijz:
-                prods.update_one({'product': self.product},
-                                 {'$inc': incs, '$set': {'bijz.' + str(bestelnr): self.bijz}}, upsert=True)
-            else:
-                prods.update_one({'product': self.product}, {'$inc': incs}, upsert=True)
+            prods.update_one({'product': self.product},
+                             {'$inc': incs,
+                              '$set': {'cat': 'menu'}},
+                             upsert=True)
 
 
 class Gourmet:
@@ -124,10 +114,16 @@ class Gourmet:
 
         if self.bijz:
             new_doc['bijz'] = self.bijz
-            prods.update_one({'product': self.product}, {'$inc': incs, '$set': {'bijz.' + str(bestelnr): self.bijz}},
+            prods.update_one({'product': self.product},
+                             {'$inc': incs,
+                              '$set': {'bijz.' + str(bestelnr): self.bijz,
+                                       'cat': 'zelf_gourmet'}},
                              upsert=True)
         else:
-            prods.update_one({'product': self.product}, {'$inc': incs}, upsert=True)
+            prods.update_one({'product': self.product},
+                             {'$inc': incs,
+                              '$set': {'cat': 'zelf_gourmet'}},
+                             upsert=True)
 
         bests.update_one({'bestelnr': bestelnr}, {"$push": {"producten": new_doc}})
 
@@ -150,10 +146,18 @@ class DryAgedVlees:
 
         if self.bijz:
             new_doc['bijz'] = self.bijz
-            prods.update_one({'product': self.product}, {'$inc': incs, '$set': {'bijz.' + str(bestelnr): self.bijz}},
+            prods.update_one({'product': self.product},
+                             {'$inc': incs,
+                              '$set': {
+                                  'bijz.' + str(bestelnr): self.bijz,
+                                  'cat': 'dry_aged'
+                              }},
                              upsert=True)
         else:
-            prods.update_one({'product': self.product}, {'$inc': incs}, upsert=True)
+            prods.update_one({'product': self.product},
+                             {'$inc': incs,
+                              '$set': {'cat': 'dry_aged'}},
+                             upsert=True)
 
         bests.update_one({'bestelnr': bestelnr}, {"$push": {"producten": new_doc}})
 
