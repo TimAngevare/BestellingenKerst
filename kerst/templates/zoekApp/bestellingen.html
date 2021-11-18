@@ -5,7 +5,7 @@
     <h1>Zoek bestellingen</h1>
     <hr>
     <h2>Filter</h2>
-    <form method="post" action="{% url 'zoekApp:Bestellingen_resultaten' %}">
+    <form method="post" action="{% url 'zoekApp:bestellingen' %}">
         {% csrf_token %}
         {{bestel_form}}
         <button type="submit", name="save">Zoek</button>
