@@ -4,7 +4,6 @@ from django.contrib import messages
 from . import forms
 import mongo_manage
 
-
 def zoek(request):
     return render(request, 'zoekApp/zoek.html')
 
@@ -16,7 +15,8 @@ def bestellingen(request):
             num = bestel_form.cleaned_data["bestel_nmr"]
             tel = bestel_form.cleaned_data["tel"]
             dag = bestel_form.cleaned_data["dag_ophalen"]
-            mongo_manage.zoek_best(num, tel, dag)
+            global resultaten
+            resultaten = mongo_manage.zoek_best(num, tel, dag)
         else:
             num = "2301"
             messages.error(request, "Hier klopt iets niet, vul opnieuw in")
@@ -27,7 +27,6 @@ def bestellingen(request):
 
 
 def bestellingen_resultaten(request):
-    resultaten = mongo_manage.zoek_best.resultaten
     return render(request, 'zoekApp/bestellingen.html', {"resultaten": resultaten})
 
 

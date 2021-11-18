@@ -33,6 +33,7 @@ def zoek_best(num, tel, dag):
         resultaten = bests.find({'bestelnr': int(num), 'telnr': tel})
     else:
         resultaten = 1
+    return resultaten
 
 
 def cat_toevoegen():
