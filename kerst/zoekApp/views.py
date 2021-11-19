@@ -16,9 +16,9 @@ def bestellingen(request):
             tel = bestel_form.cleaned_data["tel"]
             dag = bestel_form.cleaned_data["dag_ophalen"]
             resultaten = mongo_manage.zoek_best(num, tel, dag)
-            return render(request, 'zoekApp/bestellingen_results.html', {"resultaten": resultaten}) 
+            totaal = resultaten.count()
+            return render(request, 'zoekApp/bestellingen_results.html', {"resultaten": resultaten, "totaal" : totaal}) 
         else:
-            num = "2301"
             messages.error(request, "Hier klopt iets niet, vul opnieuw in")
         #return HttpResponse("zoekApp/bestellingen_results.html") 
     else:
@@ -31,7 +31,20 @@ def bestellingen(request):
 
 
 def producten(request):
-    pass
+    if request.method == "POST":
+        producten_form = forms.producten(request.POST)
+        if producten_form.is_valid():
+            typ_prod = producten_form.cleaned_data["temp_prod_type"]
+            prod = producten_form.cleaned_data["temp_product"]
+            resultaten = mongo_manage.zoek_prod(typ_prod, prod)
+            totaal = resultaten.count()
+            return render(request, 'zoekApp/producten_results.html', {"resultaten": resultaten, "totaal" : totaal}) 
+        else:
+            messages.error(request, "Hier klopt iets niet, vul opnieuw in")
+        #return HttpResponse("zoekApp/bestellingen_results.html") 
+    else:
+        producten_form = forms.producten()
+    return render(request, 'zoekApp/producten.html', {"producten_form": producten_form})
 
 
 def alles(request):

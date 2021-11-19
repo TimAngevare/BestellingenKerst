@@ -14,5 +14,15 @@ class bestellingen(forms.Form):
     dag_ophalen = forms.IntegerField(required=False, min_value=23, max_value=25)
     tel = forms.CharField(required=False, max_length=12, min_length=12)
 
-class Producten(forms.Form):
-    pass
+class producten(forms.Form):
+    temp_prod_type = forms.ChoiceField(label=mark_safe("Type product"),
+                                   choices=TYPE_OPTION,
+                                   widget=forms.Select(
+                                       attrs={'class': 'w3-select'}
+                                   ))
+    temp_product = forms.CharField(label="Product",
+                               max_length=100,
+                               required=False,
+                               widget=forms.TextInput(
+                                   attrs={'class': 'w3-input w3-border w3-light-grey', 'list': 'products'}
+                               ))

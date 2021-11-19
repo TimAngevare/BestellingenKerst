@@ -28,11 +28,13 @@
             {% comment %} {% if mainpage %}<div class="w3-display-right w3-margin"><a href="/slagersadmin">admin</a></div>{% endif %} {% endcomment %}        
         </header>
         {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-            {% endfor %}
-        </ul>
+        <div class="w3-display-container w3-red">
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
         {% endif %}
 
         {% block content%}
