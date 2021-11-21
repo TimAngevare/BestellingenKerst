@@ -1,14 +1,14 @@
 {% extends 'main.html' %}
 
 {% block content %}
-<div class="w3-display-middle">
+<div class="w3-display-middle" style="position: auto; display: block; padding-top: 20%;">
     <h1> Resultaten </h1>
     <br><h2>Totaal bestellingen</h2>
     <h3>{{ totaal }}</h3>
     <br><hr>
     <h2>Bestellingen</h2>
     {% for product in resultaten %}
-        <div class="w3-container w3-teal">
+        <div class="w3-container w3-teal" style="padding-bottom: 10px;">
             {% for key, value in product.items %}
                 <p>{{ key }} : {{ value }}</p>
             {% endfor %}

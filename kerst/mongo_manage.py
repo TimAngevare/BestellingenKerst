@@ -17,28 +17,26 @@ def verwijder_best():
 
 def zoek_prod(typ_prod, prod):
     if prod != '':
-        resultaten = prods.find({}, {'cat' : typ_prod, 'product' : prod})
+        resultaten = prods.find({'cat' : typ_prod, 'product' : prod})
     else:
-        resultaten = prods.find({}, {'cat' : typ_prod})
+        resultaten = prods.find({'cat' : typ_prod})
     return resultaten
 
 def zoek_best(num, tel, dag):
-    if num != '' and tel != '' and dag != '':
-        resultaten = bests.find({}, {'bestelnr': int(num), 'dagophalen': dag, 'telnr': tel})
-    elif num == '' and dag == '':
-        resultaten = bests.find({}, {'telnr': tel})
+    if num != '' and tel != '' and dag != None:
+        resultaten = bests.find({'bestelnr': int(num), 'dagophalen': dag, 'telnr': tel})
+    elif num == '' and dag == None:
+        resultaten = bests.find({'telnr': tel})
     elif num == '' and tel == '':
-        resultaten = bests.find({}, {'dagophalen': dag})
-    elif dag == '' and tel == '':
-        resultaten = bests.find({}, {'bestelnr': int(num)})
+        resultaten = bests.find({'dagophalen': dag})
+    elif dag == None and tel == '':
+        resultaten = bests.find({'bestelnr': int(num)})
     elif num == '':
-        resultaten = bests.find({}, {'dagophalen': dag, 'telnr': tel})
+        resultaten = bests.find({'dagophalen': dag, 'telnr': tel})
     elif tel == '':
-        resultaten = bests.find({}, {'bestelnr': int(num), 'dagophalen': dag})
-    elif dag == '':
-        resultaten = bests.find({}, {'bestelnr': int(num), 'telnr': tel})
-    else:
-        resultaten = 1
+        resultaten = bests.find({'bestelnr': int(num), 'dagophalen': dag})
+    elif dag == None:
+        resultaten = bests.find({'bestelnr': int(num), 'telnr': tel})
     return resultaten
 
 
