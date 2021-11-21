@@ -8,6 +8,16 @@ TYPE_OPTION = (
     ("gourmet", "Gourmet"),
     ("dryaged", "Dry Aged Vlees"),
 )
+TYPE_DAY = (
+    (23, 23),
+    (24, 24),
+)
+TYPE_STATE = (
+    (0 , "Niet gestart"),
+    (1, "Bezig"),
+    (2, "Klaar"),
+    (3, "Problemen")
+)
 
 class bestellingen(forms.Form):
     bestel_nmr = forms.IntegerField(required=False, min_value=1, max_value=3000)
@@ -26,3 +36,16 @@ class producten(forms.Form):
                                widget=forms.TextInput(
                                    attrs={'class': 'w3-input w3-border w3-light-grey', 'list': 'products'}
                                ))
+class alles(forms.Form):
+    dag = forms.ChoiceField(label=mark_safe("dag"),
+                                   choices=TYPE_DAY,
+                                   required=False,
+                                   widget=forms.Select(
+                                       attrs={'class': 'w3-select'}
+                                   ))
+    state = forms.ChoiceField(label=mark_safe("dag"),
+                                   choices=TYPE_STATE,
+                                   required=False,
+                                   widget=forms.Select(
+                                       attrs={'class': 'w3-select'}
+                                   ))

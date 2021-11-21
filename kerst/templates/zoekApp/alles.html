@@ -1,0 +1,26 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="w3-display-middle">
+    <h2>Filter</h2> <br>
+    <form method="post" action="{% url 'zoekApp:alles' %}">
+        {% csrf_token %}
+        {{alles_form}}
+        <button type="submit", name="save">Zoek</button>
+    </form>
+    <br>
+    <hr>
+    <h2>Totaal bestellingen</h2>
+    <h3>{{ totaal }}</h3>
+    <br><hr>
+    <h2>Bestellingen</h2>
+    {% for product in resultaten %}
+        <div class="w3-container w3-teal">
+            {% for key, value in product.items %}
+                <p>{{ key }} : {{ value }}</p>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock content %}
