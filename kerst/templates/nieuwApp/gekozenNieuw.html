@@ -15,7 +15,13 @@
             <input type="hidden" name="bestelnr" id="bestelnr" value="{{ passed_bestelnr }}">
             <input type="hidden" name="usr_email" id="usr_email" value="{{ passed_email }}">
 
-            {{form}}
+            {% if gekozen_type == 'menu' %}
+                <input type="hidden" name="product" id="product" value="traditioneel_kerstmenu">
+            {% elif gekozen_type == 'zelf_gourmet' %}
+                <input type="hidden" name="product" id="product" value="zelf_gourmet">
+            {% endif %}
+
+            {{ product_form }}
 
             <datalist id="products">
                 {% for prod in products_list %}
@@ -24,9 +30,8 @@
             </datalist>
 
             <div class="w3-bar w3-container w3-margin">
-                <input class="w3-btn w3-round-large w3-amber" style="width: 35%;" type="submit" name="done" value="Nog een product">
-                <input class="w3-btn w3-round-large w3-blue" style="width: 25%;" type="submit" name="done" value="Klaar">
-                <input class="w3-btn w3-round-large w3-red" style="width: 35%;" type="submit" name="done" value="Verwijder bestelling">
+                <input class="w3-btn w3-round-large w3-amber" style="width: 45%;" type="submit" name="done" value="Nog een product">
+                <input class="w3-btn w3-round-large w3-blue" style="width: 35%;" type="submit" name="done" value="Klaar">
             </div>
         </form>
     </div>
@@ -43,16 +48,32 @@
                 <p>{{passed_email}}</p>
             </div>
         </div>
-        {% if gekozen_type == 'menu' %}
         <div class="w3-card w3-margin">
             <header class="w3-container w3-indigo">
-                    <h3>Speciaal bij menu's</h3>
+                    <h3>Speciale opties</h3>
             </header>
             <div class="w3-container">
-                <p>Bij het <strong>traditioneel kerstmenu</strong> zit automatisch het Beef Wellington hoofdgerecht en een dessert buffet, deze keuze hoeft dus niet gemaakt te worden.</p>
+                <form autocomplete="off" action="{% url 'nieuwApp:specialeoptie' %}" method="post" class="w3-container w3-margin">
+                    {% csrf_token %}
+                    <input type="hidden" name="huidig_type" id="huidig_type" value="{{ gekozen_type }}">
+                    <input type="hidden" name="bestelnr" id="bestelnr" value="{{ passed_bestelnr }}">
+                    <input type="hidden" name="usr_email" id="usr_email" value="{{ passed_email }}">
+
+                    <div class="w3-bar w3-container w3-margin">
+                        {{ speciale_optie_form }}
+                        <br>
+                        <input class="w3-btn w3-round-large w3-amber" type="submit" name="done" value="Ander type product">
+                    </div>
+
+                    <div class="w3-bar w3-container w3-margin">
+                        <input class="w3-btn w3-round-large w3-blue" type="submit" name="done" value="Nieuw product">
+                        <input class="w3-btn w3-round-large w3-red" type="submit" name="done" value="Verwijder bestelling">
+                        <input class="w3-btn w3-round-large w3-teal" type="submit" name="done" value="Negeren en afronden">
+                    </div>
+                </form>
             </div>
         </div>
-        {% elif gekozen_type == 'gourmet' %}
+        {% if gekozen_type == 'zelf_gourmet' %}
         <div class="w3-card w3-margin">
             <header class="w3-container w3-indigo">
                     <h3>Speciaal bij gourmet</h3>

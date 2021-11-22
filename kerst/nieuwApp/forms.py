@@ -42,16 +42,15 @@ SOORT_OPTION = (
 )
 
 DRYAGED_OPTION = (
-    ('blonde aquitaine', 'Blonde Aquitaine'),
-    ('france limousin', 'France Limousin'),
-    ('spaanse rubia gallega', 'Spaanse Rubia Gallega'),
-    ('black angus', 'Black Angus'),
-    ('schotse aberdeen angus', 'Schotse Aberdeen Angus'),
-    ('friese holsteiner', 'Friese Holsteiner'),
-    ('west vlaams rood', 'West Vlaams Rood'),
-    ('simmentaler oostenrijk', 'Simmentaler Oostenrijk'),
-    ('australisch angus', 'Australisch Angus'),
-    ('spaans bavette', 'Spaans bavette'),
+    ('blonde_aquitaine', 'Blonde Aquitaine'),
+    ('france_limousin', 'France Limousin'),
+    ('spaanse_rubia_gallega', 'Spaanse Rubia Gallega'),
+    ('black_angus', 'Black Angus'),
+    ('schotse_aberdeen_angus', 'Schotse Aberdeen Angus'),
+    ('friese_holsteiner', 'Friese Holsteiner'),
+    ('west_vlaams_rood', 'West Vlaams Rood'),
+    ('simmentaler_oostenrijk', 'Simmentaler Oostenrijk'),
+    ('australisch_angus', 'Australisch Angus'),
 )
 
 
@@ -117,6 +116,10 @@ class ProductForm(forms.Form):
     product = temp_product
     cat = forms.CharField(label="Categorie", max_length=100, widget=forms.TextInput(
         attrs={'class': 'w3-input w3-border w3-light-grey'}))
+
+
+class SpecialeOptieForm(forms.Form):
+    prod_type = temp_prod_type
 
 
 class SnijdForm(forms.Form):

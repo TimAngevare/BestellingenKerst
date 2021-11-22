@@ -39,8 +39,6 @@ def kies_form(het_type):
         return MenuForm()
     elif het_type == 'zelf_gourmet':
         return GourmetForm()
-    # elif het_type == 'formaat':
-    #     return FormaatForm(), prod_list
     elif het_type == 'dry_aged':
         return DryAgedForm()
     elif het_type == 'standaard':
@@ -71,7 +69,7 @@ def nieuw_bestel(request):
 
             nieuw_nr = hoogst_huidig + 1
             str_nieuw_nr = str(nieuw_nr)
-            while len(str_nieuw_nr) < 4:
+            while len(str_nieuw_nr) < 3:
                 str_nieuw_nr = '0' + str_nieuw_nr
 
             str_nieuw_bestelnr = dag_ophalen + str_nieuw_nr
@@ -89,12 +87,14 @@ def nieuw_bestel(request):
                 'passed_bestelnr': nieuw_bestelnr,
                 'passed_email': email,
                 'products_list': prod_list,
-                'form': kies_form(gekozen_type)
+                'product_form': kies_form(gekozen_type),
+                'speciale_optie_form': SpecialeOptieForm()
             })
         else:
             messages.error(request, "niet alles ingevuld")
         return render(request, 'nieuwApp/nieuw.html', {
-            'form': form
+            'product_form': form,
+            'speciale_optie_form': SpecialeOptieForm()
         })
     else:
         return HttpResponse("Wejow gek dit kan niet zomaar he.")
@@ -112,7 +112,8 @@ def bestel_done(request):
                 'passed_bestelnr': bestelnr,
                 'passed_email': email,
                 'products_list': prod_list,
-                'form': kies_form(prod_type)
+                'product_form': kies_form(prod_type),
+                'speciale_optie_form': SpecialeOptieForm()
             })
 
         form = BestellingAfmakenForm(request.POST)
@@ -135,7 +136,8 @@ def bestel_done(request):
                 'error_message': 'Oeps er is iets mis, waarschijnlijk heb je het telefoonnummer of de tijd van ophalen niet correct ingevoerd.',
                 'passed_bestelnr': request.POST['bestelnr'],
                 'passed_email': request.POST['usr_email'],
-                'form': form
+                'product_form': form,
+                'speciale_optie_form': SpecialeOptieForm()
             })
     else:
         return HttpResponse("ja dit kan dus weer niet he")
@@ -154,7 +156,8 @@ def prod_toevoegen(request):
                 'passed_bestelnr': bestelnr,
                 'passed_email': email,
                 'products_list': prod_list,
-                'form': kies_form(oude_type)
+                'product_form': kies_form(oude_type),
+                'speciale_optie_form': SpecialeOptieForm()
             })
         elif form.is_valid():
             data = form.cleaned_data
@@ -167,7 +170,8 @@ def prod_toevoegen(request):
                 'passed_bestelnr': bestelnr,
                 'passed_email': email,
                 'products_list': prod_list,
-                'form': kies_form(oude_type)
+                'product_form': kies_form(oude_type),
+                'speciale_optie_form': SpecialeOptieForm()
             })
         else:
             return render(request, 'nieuwApp/nieuwProduct.html', {
@@ -182,16 +186,89 @@ def prod_toevoegen(request):
         return HttpResponse("Gast dit kan niet jonge")
 
 
+def speciale_optie(request):
+    if request.method == 'POST':
+        bestelnr = int(request.POST['bestelnr'])
+        email = request.POST['usr_email']
+        oude_type = request.POST['huidig_type']
+
+        if request.POST['done'] == 'Verwijder bestelling':
+            producten_array = (bests.find_one({'bestelnr': bestelnr}, {'producten': 1}))['producten']
+
+            for product in producten_array:
+                prod_naam = product['product']
+                inc_doc = {}
+
+                try:
+                    snijden = product['snijden']
+                    inc_doc['gewicht'] = int(product['gewicht']) * -1
+                    for gewicht, aantal in snijden.items():
+                        inc_doc['snijden.' + gewicht] = int(aantal) * -1
+
+                except KeyError:
+                    cat_doc = prods.find_one({'product': prod_naam})
+                    cat = cat_doc['cat']
+                    if cat == 'zelf_gourmet':
+                        for prod, aantal in product['conf'].items():
+                            inc_doc['conf.' + prod] = int(aantal) * -1
+
+                    elif cat == 'dry_aged':
+                        inc_doc[product['soort']] = int(product['gewicht']) * -1
+
+                    elif cat == 'menu':
+                        aantal = int(product['aantal'])
+                        inc_doc['aantal'] = aantal * -1
+
+                        for gerecht, nummer in product['voorgerecht'].items():
+                            inc_doc['voorgerecht.' + gerecht] = int(nummer) * -1
+
+                        inc_doc['hoofdgerecht.beef_wellington'] = aantal * -1
+                        inc_doc['dessert.dessert_buffet'] = aantal * -1
+
+                    else:
+                        inc_doc['aantal'] = int(product['aantal']) * -1
+
+                prods.update_one({'product': prod_naam}, {'$inc': inc_doc})
+
+            bests.delete_one({'bestelnr': bestelnr})
+            return HttpResponseRedirect('/')
+
+        elif request.POST['done'] == 'Nieuw product toevoegen':
+            return render(request, 'nieuwApp/nieuwProduct.html', {
+                'nieuw_prod': request.POST['product'],
+                'gekozen_type': oude_type,
+                'passed_bestelnr': bestelnr,
+                'passed_email': email,
+                'form': ProductForm()
+            })
+
+        elif request.POST['done'] == 'Ander type product':
+            nieuw_type = request.POST['prod_type']
+            return render(request, 'nieuwApp/gekozenNieuw.html', {
+                'gekozen_type': nieuw_type,
+                'passed_bestelnr': bestelnr,
+                'passed_email': email,
+                'products_list': prod_list,
+                'product_form': kies_form(nieuw_type),
+                'speciale_optie_form': SpecialeOptieForm()
+            })
+        elif request.POST['done'] == 'Negeren en afronden':
+            return render(request, 'nieuwApp/bestellingAfmaken.html', {
+                'passed_bestelnr': bestelnr,
+                'passed_email': email,
+                'form': BestellingAfmakenForm()
+            })
+
+    else:
+        return HttpResponse('Gozer, wat annoying dit is niet de bedoeling. Ga lekker naar een andere pagina mijn amice.')
+
+
 def nieuw_keuze(request):
     if request.method == 'POST':
         bestelnr = int(request.POST['bestelnr'])
         email = request.POST['usr_email']
         oude_type = request.POST['huidig_type']
         nieuw_type = request.POST['prod_type']
-
-        if request.POST['done'] == 'Verwijder bestelling':
-            bests.delete_one({'bestelnr': bestelnr})
-            return HttpResponseRedirect('/')
 
         if request.POST['product'] not in prod_list:
             return render(request, 'nieuwApp/nieuwProduct.html', {
@@ -224,7 +301,8 @@ def nieuw_keuze(request):
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
                     'products_list': prod_list,
-                    'form': SnijdForm()
+                    'product_form': SnijdForm(),
+                    'speciale_optie_form': SpecialeOptieForm()
                 })
 
         elif oude_type == 'menu':
@@ -240,7 +318,7 @@ def nieuw_keuze(request):
                 if int_carp > 0: v_gerecht_doc['carpaccio'] = int_carp
                 if int_ragout > 0: v_gerecht_doc['kalfsragout'] = int_ragout
 
-                Menu('traditioneel kerstmenu', int(data['aantal']), v_gerecht_doc, 'beef_wellington', 'dessert_buffet', data['bijz']).insert(bestelnr)
+                Menu('traditioneel_kerstmenu', int(data['aantal']), v_gerecht_doc, 'beef_wellington', 'dessert_buffet', data['bijz']).insert(bestelnr)
 
             else:
                 return render(request, 'nieuwApp/gekozenNieuw.html', {
@@ -249,7 +327,8 @@ def nieuw_keuze(request):
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
                     'products_list': prod_list,
-                    'form': form
+                    'product_form': form,
+                    'speciale_optie_form': SpecialeOptieForm()
                 })
 
         elif oude_type == 'zelf_gourmet':
@@ -274,7 +353,8 @@ def nieuw_keuze(request):
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
                     'products_list': prod_list,
-                    'form': form
+                    'product_form': form,
+                    'speciale_optie_form': SpecialeOptieForm()
                 })
 
         elif oude_type == 'dry_aged':
@@ -289,7 +369,8 @@ def nieuw_keuze(request):
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
                     'products_list': prod_list,
-                    'form': form
+                    'product_form': form,
+                    'speciale_optie_form': SpecialeOptieForm()
                 })
 
         elif oude_type == 'standaard':
@@ -304,7 +385,8 @@ def nieuw_keuze(request):
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
                     'products_list': prod_list,
-                    'form': form
+                    'product_form': form,
+                    'speciale_optie_form': SpecialeOptieForm()
                 })
 
         if request.POST['done'] == 'Klaar':
@@ -319,7 +401,8 @@ def nieuw_keuze(request):
                 'passed_bestelnr': bestelnr,
                 'passed_email': email,
                 'products_list': prod_list,
-                'form': kies_form(nieuw_type)
+                'product_form': kies_form(nieuw_type),
+                'speciale_optie_form': SpecialeOptieForm()
             })
 
     else:

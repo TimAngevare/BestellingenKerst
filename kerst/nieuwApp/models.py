@@ -142,7 +142,7 @@ class DryAgedVlees:
             'gewicht': self.gewicht,
         }
 
-        incs = {self.soort: self.gewicht}
+        incs = {self.soort: int(self.gewicht)}
 
         if self.bijz:
             new_doc['bijz'] = self.bijz
