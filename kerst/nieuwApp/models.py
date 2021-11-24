@@ -40,7 +40,7 @@ class Snijdvlees:
             new_doc['bijz'] = self.bijz
             prods.update_one({'product': self.product},
                              {'$inc': incs,
-                              '$set': {'bijz.' + str(bestelnr): self.bijz}},
+                              '$push': {'bijz': {str(bestelnr): self.bijz}}},
                              upsert=True)
         else:
             prods.update_one({'product': self.product}, {'$inc': incs}, upsert=True)
@@ -83,9 +83,7 @@ class Menu:
         if self.bijz:
             prods.update_one({'product': self.product},
                              {'$inc': incs,
-                              '$set': {
-                                  'bijz.' + str(bestelnr): self.bijz,
-                                  'cat': 'menu'}},
+                              '$push': {'bijz': {str(bestelnr): self.bijz}}},
                              upsert=True)
         else:
             prods.update_one({'product': self.product},
@@ -116,8 +114,7 @@ class Gourmet:
             new_doc['bijz'] = self.bijz
             prods.update_one({'product': self.product},
                              {'$inc': incs,
-                              '$set': {'bijz.' + str(bestelnr): self.bijz,
-                                       'cat': 'zelf_gourmet'}},
+                              '$push': {'bijz': {str(bestelnr): self.bijz}}},
                              upsert=True)
         else:
             prods.update_one({'product': self.product},
@@ -148,10 +145,7 @@ class DryAgedVlees:
             new_doc['bijz'] = self.bijz
             prods.update_one({'product': self.product},
                              {'$inc': incs,
-                              '$set': {
-                                  'bijz.' + str(bestelnr): self.bijz,
-                                  'cat': 'dry_aged'
-                              }},
+                              '$push': {'bijz': {str(bestelnr): self.bijz}}},
                              upsert=True)
         else:
             prods.update_one({'product': self.product},
@@ -178,7 +172,7 @@ class Standaard:
 
         if self.bijz:
             new_doc['bijz'] = self.bijz
-            prods.update_one({'product': self.product}, {'$inc': incs, '$set': {'bijz.' + str(bestelnr): self.bijz}},
+            prods.update_one({'product': self.product}, {'$inc': incs, '$push': {'bijz': {str(bestelnr): self.bijz}}},
                              upsert=True)
         else:
             prods.update_one({'product': self.product}, {'$inc': incs}, upsert=True)

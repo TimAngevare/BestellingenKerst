@@ -5,35 +5,37 @@
 {% if error_message %}<div class="w3-panel w3-red w3-container"><p>{{ error_message }}</p></div>{% endif %}
 
 <div class="w3-row w3-margin">
-    <div class="w3-card w3-third" style="margin-right: 100px;">
-        <header class="w3-container w3-blue-grey">
-            <h3>Nieuw product - {{gekozen_type}}</h3>
-        </header>
-        <form autocomplete="off" action="{% url 'nieuwApp:nieuwproduct' %}" method="post" class="w3-container w3-margin">
-            {% csrf_token %}
-            <input type="hidden" name="huidig_type" id="huidig_type" value="{{ gekozen_type }}">
-            <input type="hidden" name="bestelnr" id="bestelnr" value="{{ passed_bestelnr }}">
-            <input type="hidden" name="usr_email" id="usr_email" value="{{ passed_email }}">
+    <div class="w3-third w3-left">
+        <div class="w3-card w3-margin">
+            <header class="w3-container w3-blue-grey">
+                <h3>Nieuw product - {{gekozen_type}}</h3>
+            </header>
+            <form autocomplete="off" spellcheck="false" action="{% url 'nieuwApp:nieuwproduct' %}" method="post" class="w3-container w3-margin">
+                {% csrf_token %}
+                <input type="hidden" name="huidig_type" id="huidig_type" value="{{ gekozen_type }}">
+                <input type="hidden" name="bestelnr" id="bestelnr" value="{{ passed_bestelnr }}">
+                <input type="hidden" name="usr_email" id="usr_email" value="{{ passed_email }}">
 
-            {% if gekozen_type == 'menu' %}
-                <input type="hidden" name="product" id="product" value="traditioneel_kerstmenu">
-            {% elif gekozen_type == 'zelf_gourmet' %}
-                <input type="hidden" name="product" id="product" value="zelf_gourmet">
-            {% endif %}
+                {% if gekozen_type == 'menu' %}
+                    <input type="hidden" name="product" id="product" value="traditioneel_kerstmenu">
+                {% elif gekozen_type == 'zelf_gourmet' %}
+                    <input type="hidden" name="product" id="product" value="zelf_gourmet">
+                {% endif %}
 
-            {{ product_form }}
+                {{ product_form }}
 
-            <datalist id="products">
-                {% for prod in products_list %}
-                <option value="{{prod}}"> 
-                {% endfor %}
-            </datalist>
+                <datalist id="products">
+                    {% for prod in products_list %}
+                    <option value="{{prod}}">
+                    {% endfor %}
+                </datalist>
 
-            <div class="w3-bar w3-container w3-margin">
-                <input class="w3-btn w3-round-large w3-amber" style="width: 45%;" type="submit" name="done" value="Nog een product">
-                <input class="w3-btn w3-round-large w3-blue" style="width: 35%;" type="submit" name="done" value="Klaar">
-            </div>
-        </form>
+                <div class="w3-bar w3-container w3-margin">
+                    <input class="w3-btn w3-round-large w3-amber" style="width: 45%;" type="submit" name="done" value="Nog een product">
+                    <input class="w3-btn w3-round-large w3-blue" style="width: 35%;" type="submit" name="done" value="Afronden">
+                </div>
+            </form>
+        </div>
     </div>
 
     <div class="w3-third w3-center">
@@ -42,14 +44,36 @@
                     <h3>Huidige Bestelling</h3>
             </header>
             <div class="w3-container">
-                <p><strong>Bestelling</strong></p>
-                <p>{{passed_bestelnr}}</p>
-                <p><strong>Email adres</strong></p>
-                <p>{{passed_email}}</p>
+                <p><strong>Bestelling</strong>: #{{ passed_bestelnr }}</p>
+                <p><strong>Email adres</strong>: {{ passed_email }}</p>
+                <p><strong>Producten</strong>: {{ huidige_producten }}</p>
             </div>
         </div>
+
+        {% if gekozen_type == 'zelf_gourmet' %}
         <div class="w3-card w3-margin">
             <header class="w3-container w3-indigo">
+                    <h3>Speciaal bij gourmet</h3>
+            </header>
+            <div class="w3-container">
+                <p>Elke +1 staat voor <strong>200 gram</strong> van dat product.</p>
+            </div>
+        </div>
+        {% elif gekozen_type == 'snijdvlees' %}
+        <div class="w3-card w3-margin">
+            <header class="w3-container w3-indigo">
+                    <h3>Speciaal bij snijdvlees</h3>
+            </header>
+            <div class="w3-container">
+                <p>Format voor snijden: <strong>(gewicht):(aantal),</strong> , bijvoorbeeld: <strong>300:2,</strong> (met altijd dus aan het eind een komma)</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="w3-third w3-center">
+        <div class="w3-card w3-margin">
+            <header class="w3-container w3-pink">
                     <h3>Speciale opties</h3>
             </header>
             <div class="w3-container">
@@ -62,27 +86,17 @@
                     <div class="w3-bar w3-container w3-margin">
                         {{ speciale_optie_form }}
                         <br>
-                        <input class="w3-btn w3-round-large w3-amber" type="submit" name="done" value="Ander type product">
+                        <input class="w3-btn w3-round-large w3-amber w3-margin" type="submit" name="done" value="Ander type product">
                     </div>
-
+                    <hr>
                     <div class="w3-bar w3-container w3-margin">
                         <input class="w3-btn w3-round-large w3-blue" type="submit" name="done" value="Nieuw product">
                         <input class="w3-btn w3-round-large w3-red" type="submit" name="done" value="Verwijder bestelling">
-                        <input class="w3-btn w3-round-large w3-teal" type="submit" name="done" value="Negeren en afronden">
+                        <input class="w3-btn w3-round-large w3-teal w3-margin" type="submit" name="done" value="Negeren en afronden">
                     </div>
                 </form>
             </div>
         </div>
-        {% if gekozen_type == 'zelf_gourmet' %}
-        <div class="w3-card w3-margin">
-            <header class="w3-container w3-indigo">
-                    <h3>Speciaal bij gourmet</h3>
-            </header>
-            <div class="w3-container">
-                <p>Elke +1 staat voor <strong>200 gram</strong> van dat product.</p>
-            </div>
-        </div>
-        {% endif %}
     </div>
     
 </div>

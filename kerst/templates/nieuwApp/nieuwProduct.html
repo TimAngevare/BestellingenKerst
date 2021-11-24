@@ -7,8 +7,9 @@
 <div class="w3-card w3-container">
         <header class="w3-container w3-blue-grey">
             <h3>Zeker? - {{nieuw_prod}}</h3>
+            <p>Dit product staat nog niet in het systeem. Herhaal de naam om het toe te voegen.</p>
         </header>
-        <form autocomplete="off" action="{% url 'nieuwApp:producttoevoegen' %}" method="post" class="w3-container w3-margin">
+        <form autocomplete="off" spellcheck="false" action="{% url 'nieuwApp:producttoevoegen' %}" method="post" class="w3-container w3-margin">
             {% csrf_token %}
             <input type="hidden" name="huidig_type" id="huidig_type" value="{{ gekozen_type }}">
             <input type="hidden" name="bestelnr" id="bestelnr" value="{{ passed_bestelnr }}">

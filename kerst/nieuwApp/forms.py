@@ -65,7 +65,9 @@ def standaard_aantal(prod_label):
 temp_product = forms.CharField(label="Product",
                                max_length=100,
                                widget=forms.TextInput(
-                                   attrs={'class': 'w3-input w3-border w3-light-grey', 'list': 'products'}
+                                   attrs={'class': 'w3-input w3-border w3-light-grey',
+                                          'list': 'products',
+                                          'spellcheck': 'false'}
                                ))
 
 temp_bijz = forms.CharField(label="Bijzonderheden",
@@ -109,7 +111,6 @@ class BestellingAfmakenForm(forms.Form):
                                 attrs={'class': 'w3-input w3-border w3-light-grey', 'value': '+316'}))
     tijdophalen = forms.CharField(label="Tijd ophalen", max_length=5, validators=[tijdophalen_validator],
                                   widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
-    prod_type = temp_prod_type
 
 
 class ProductForm(forms.Form):
