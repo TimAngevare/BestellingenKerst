@@ -20,7 +20,7 @@ TYPE_STATE = (
 )
 
 class bestellingen(forms.Form):
-    bestel_nmr = forms.IntegerField(required=False, min_value=1, max_value=3000)
+    bestel_nmr = forms.IntegerField(required=False, min_value=1, max_value=30000)
     dag_ophalen = forms.IntegerField(required=False, min_value=23, max_value=25)
     tel = forms.CharField(required=False, max_length=12, min_length=12)
 
@@ -43,7 +43,7 @@ class alles(forms.Form):
                                    widget=forms.Select(
                                        attrs={'class': 'w3-select'}
                                    ))
-    state = forms.ChoiceField(label=mark_safe("dag"),
+    state = forms.ChoiceField(label=mark_safe("eigenschap"),
                                    choices=TYPE_STATE,
                                    required=False,
                                    widget=forms.Select(

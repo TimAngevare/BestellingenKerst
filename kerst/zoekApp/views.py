@@ -49,12 +49,13 @@ def producten(request):
 
 def alles(request):
     if request.method == "POST":
-        producten_form = forms.producten(request.POST)
-        if producten_form.is_valid():
-            #resultaten = mongo_manage.zoek_best()
-            #totaal = resultaten.count()
-            #return render(request, 'zoekApp/producten_results.html', {"resultaten": resultaten, "totaal" : totaal}) 
-            pass
+        alles_form = forms.alles(request.POST)
+        if alles_form.is_valid():
+            dag = alles_form.cleaned_data["dag"]
+            state = alles_form.cleaned_data["state"]
+            resultaten = mongo_manage.zoek_best_alles(dag, state)
+            totaal = resultaten.count()
+            return render(request, 'zoekApp/alles.html', {"resultaten": resultaten, "totaal" : totaal}) 
         else:
             messages.error(request, "Hier klopt iets niet, vul opnieuw in")
         #return HttpResponse("zoekApp/bestellingen_results.html") 

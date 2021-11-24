@@ -22,6 +22,15 @@ def zoek_prod(typ_prod, prod):
         resultaten = prods.find({'cat' : typ_prod})
     return resultaten
 
+def zoek_best_alles(dag, state):
+    if dag != None and state != '':
+        resultaten = bests.find({'dagophalen' : dag, 'state' : state})
+    elif dag == None:
+        resultaten = bests.find({"state" : state})
+    elif state == "":
+        resultaten = bests.find({"dagophalen" : dag})
+    return resultaten
+
 def zoek_best(num, tel, dag):
     if num != '' and tel != '' and dag != None:
         resultaten = bests.find({'bestelnr': int(num), 'dagophalen': dag, 'telnr': tel})
