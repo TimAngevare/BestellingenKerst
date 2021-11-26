@@ -23,12 +23,14 @@ def zoek_prod(typ_prod, prod):
     return resultaten
 
 def zoek_best_alles(dag, state):
-    if dag != None and state != '':
-        resultaten = bests.find({'dagophalen' : dag, 'state' : state})
-    elif dag == None:
-        resultaten = bests.find({"state" : state})
-    elif state == "":
+    if dag != '25' and state != '4':
+        resultaten = bests.find({'dagophalen' : dag, 'state' : int(state)})
+    elif dag == '25' and state != '4':
+        resultaten = bests.find({"state" : int(state)})
+    elif state == '4' and dag != '25':
         resultaten = bests.find({"dagophalen" : dag})
+    else:
+        resultaten = bests.find({})
     return resultaten
 
 def zoek_best(num, tel, dag):

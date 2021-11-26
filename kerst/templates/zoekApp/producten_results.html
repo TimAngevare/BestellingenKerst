@@ -3,16 +3,25 @@
 {% block content %}
 <div class="w3-container">
     <h1> Resultaten </h1>
-    <h2>Totaal bestellingen</h2>
+    <hr>
+    <h2>Totaal producten</h2>
     <h3>{{ totaal }}</h3>
 </div>
 <hr>
 <div class="w3-container">
     <h2>Bestellingen</h2>
     {% for product in resultaten %}
-        <div class="w3-center w3-container w3-card w3-margin w3-teal">
+        <div class="w3-center w3-container w3-card-4 w3-margin w3-teal">
             {% for key, value in product.items %}
-                <p>{{ key }} : {{ value }}</p>
+                <div class="w3-container">
+                    <ul class="w3-ul w3-border">
+                        {% if key == "product"%}
+                            <li><h4><b>{{value}}</b></h4></li>
+                        {% elif key != "_id"%}
+                            <li><p>{{ key }} : {{ value }}</p></li>
+                        {% endif %}
+                    </ul>
+                </div>
             {% endfor %}
         </div>
     {% endfor %}

@@ -46,7 +46,7 @@ def kies_form(het_type):
 
 
 def huidig_producten(bestelnr):
-    producten = bests.find_one({'bestelnr': bestelnr}, {'producten': 1})
+    producten = bests.find_one({'bestelnr': int(bestelnr)}, {'producten': 1})
     return_string = ""
     if len(producten['producten']) > 0:
         for product in producten['producten']:

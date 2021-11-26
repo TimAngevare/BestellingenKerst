@@ -11,12 +11,14 @@ TYPE_OPTION = (
 TYPE_DAY = (
     (23, 23),
     (24, 24),
+    (25, "Alles")
 )
 TYPE_STATE = (
     (0 , "Niet gestart"),
     (1, "Bezig"),
     (2, "Klaar"),
-    (3, "Problemen")
+    (3, "Problemen"),
+    (4, "Alles")
 )
 
 class bestellingen(forms.Form):
@@ -45,7 +47,7 @@ class alles(forms.Form):
                                    ))
     state = forms.ChoiceField(label=mark_safe("eigenschap"),
                                    choices=TYPE_STATE,
-                                   required=False,
+                                   required=True,
                                    widget=forms.Select(
                                        attrs={'class': 'w3-select'}
                                    ))

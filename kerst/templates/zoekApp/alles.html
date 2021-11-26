@@ -1,26 +1,52 @@
 {% extends 'main.html' %}
 
 {% block content %}
-<div class="w3-display-middle">
-    <h2>Filter</h2> <br>
-    <form method="post" action="{% url 'zoekApp:alles' %}">
-        {% csrf_token %}
-        {{alles_form}}
-        <button type="submit", name="save">Zoek</button>
-    </form>
-    <br>
+<div class="w3-container">
+    <divn class="w3-container">
+        <h2>Filter</h2> 
+        <form method="post" action="{% url 'zoekApp:alles' %}">
+            {% csrf_token %}
+            {{alles_form}}
+            <button type="submit", name="save">Zoek</button>
+        </form>
+    </div>
     <hr>
-    <h2>Totaal bestellingen</h2>
-    <h3>{{ totaal }}</h3>
-    <br><hr>
-    <h2>Bestellingen</h2>
-    {% for product in resultaten %}
-        <div class="w3-container w3-teal">
+
+    <div class="w3-container">
+        <h2>Totaal bestellingen</h2>
+        <h3>{{ totaal }}</h3>
+    </div>
+    <hr>
+    <div class="w3-container">
+        <h2>Bestellingen</h2>
+        {% for product in resultaten %}
+        <div class="w3-container w3-teal w3-margin w3-card-4">
             {% for key, value in product.items %}
-                <p>{{ key }} : {{ value }}</p>
+                {% if key == "producten" %}
+                    {% for product in value %}
+                        <div class="w3-container w3-margin">
+                            {% for property, detail in product.items%}
+                                <ul class="w3-ul w3-border">
+                                {% if property == "product"%}
+                                    <li><h4><b>{{detail}}</b></h4></li>
+                                {% else%}
+                                    <li>{{property}} : {{detail}}</li>
+                                {% endif %}
+                                </ul>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                {% elif key != "_id" %}
+                    <p>{{ key }} : {{ value }}</p>
+                {% endif %}
             {% endfor %}
+            <div class="w3-container w3-center">
+                <button class="w3-button w3-green w3-margin">Voltooi</button>
+                <button class="w3-button w3-red w3-margin">Probleem</button>
+            </div>
         </div>
     {% endfor %}
+    </div>
 </div>
 
 {% endblock content %}
