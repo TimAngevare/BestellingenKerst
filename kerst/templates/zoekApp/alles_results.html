@@ -1,0 +1,60 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="w3-container">
+        <h2>Totaal bestellingen</h2>
+        <h3>{{ totaal }}</h3>
+    </div>
+    <hr>
+    <div class="w3-container">
+        <h2>Bestellingen</h2>
+        {% for product in resultaten %}
+        <div class="w3-container w3-teal w3-margin w3-card-4">
+            {% for key, value in product.items %}
+                {% if key == "bestelnr"%}
+                    <div class="w3-container w3-center">
+                        <form method="post" action="">
+                            {% csrf_token %}
+                            <button name= "voltooi-{{value}}" class="w3-button w3-green w3-margin w3-round-large" type="submit">Voltooi</button>
+                            <button name= "probleem-{{value}}" class="w3-button w3-red w3-margin w3-round-large">Probleem</button>
+                            <button name= "behanldeling-{{value}}" class="w3-button w3-orange w3-margin w3-round-large">Neem in behandeling</button>
+                        </form>
+                    </div>
+                    <p><b>{{key}} : {{value}}</b></p>\
+                {% elif key == "state"%}
+                    {% if value == "niet_gestart"%}
+                        <div class="w3-container w3-blue-gray w3-margin w3-center">
+                            <p>Staat : {{value}}</p>
+                        </div>
+                    {% elif value == "voltooid"%}
+                        <div class="w3-container w3-green w3-margin w3-center">
+                            <p>Staat : {{value}}</p>
+                        </div>
+                    {% elif value == "probleem"%}
+                        <div class="w3-container w3-red w3-center w3-margin">
+                            <p>Staat : {{value}}</p>
+                        </div>
+                    {% endif %}
+                {% elif key == "producten" %}
+                    {% for product in value %}
+                        <div class="w3-container w3-margin">
+                            {% for property, detail in product.items%}
+                                <ul class="w3-ul w3-border">
+                                {% if property == "product"%}
+                                    <li><h4><b>{{detail}}</b></h4></li>
+                                {% else%}
+                                    <li>{{property}} : {{detail}}</li>
+                                {% endif %}
+                                </ul>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                {% elif key != "_id" %}
+                    <p>{{ key }} : {{ value }}</p>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock content %}

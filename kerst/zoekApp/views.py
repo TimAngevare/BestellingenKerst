@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.contrib import messages
 from . import forms
 import mongo_manage
@@ -53,12 +53,30 @@ def alles(request):
         if alles_form.is_valid():
             dag = alles_form.cleaned_data["dag"]
             state = alles_form.cleaned_data["state"]
-            resultaten = mongo_manage.zoek_best_alles(dag, state)
-            totaal = resultaten.count()
-            return render(request, 'zoekApp/alles.html', {"resultaten": resultaten, "totaal" : totaal}) 
+            return redirect('/zoek/alles?dag=' + dag + "&state=" + state)
         else:
             messages.error(request, "Hier klopt iets niet, vul opnieuw in")
         #return HttpResponse("zoekApp/bestellingen_results.html") 
     else:
         alles_form = forms.alles()
     return render(request, 'zoekApp/alles.html', {"alles_form": alles_form})
+
+def alles_result(request):
+    if request.method == "POST":
+        for key in request.POST.keys():
+            print(key)
+            if key.startswith('voltooi-'):
+                bestel_nmr = key[8:]
+                mongo_manage.update_state(int(bestel_nmr) , 'voltooid' )
+            elif key.startswith('probleem-'):
+                bestel_nmr = key[9:]
+                mongo_manage.update_state(int(bestel_nmr) , 'probleem' )
+            elif key.startswith('behandeling-'):
+                bestel_nmr = key[12:]
+                mongo_manage.update_state(int(bestel_nmr) , 'bezig' )
+    dag = request.GET['dag']
+    state = request.GET['state']
+    resultaten = mongo_manage.zoek_best_alles(dag, state)
+    totaal = resultaten.count()
+    return render(request, 'zoekApp/alles_results.html', {"resultaten": resultaten, "totaal" : totaal}) 
+    

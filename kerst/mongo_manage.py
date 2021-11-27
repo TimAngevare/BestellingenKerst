@@ -23,29 +23,34 @@ def zoek_prod(typ_prod, prod):
     return resultaten
 
 def zoek_best_alles(dag, state):
-    if dag != '25' and state != '4':
-        resultaten = bests.find({'dagophalen' : dag, 'state' : int(state)})
-    elif dag == '25' and state != '4':
-        resultaten = bests.find({"state" : int(state)})
-    elif state == '4' and dag != '25':
+    if dag != '25' and state != "Alles":
+        resultaten = bests.find({'dagophalen' : dag, 'state' : state})
+    elif dag == '25' and state != "Alles":
+        resultaten = bests.find({"state" : state})
+    elif state == "Alles" and dag != '25':
         resultaten = bests.find({"dagophalen" : dag})
     else:
         resultaten = bests.find({})
     return resultaten
 
+def update_state(num, state):
+    bests.update_one({'bestelnr' : num}, {'$set' : {'state' : state}}, upsert=False)
+
 def zoek_best(num, tel, dag):
-    if num != '' and tel != '' and dag != None:
-        resultaten = bests.find({'bestelnr': int(num), 'dagophalen': dag, 'telnr': tel})
-    elif num == '' and dag == None:
+    if num != None and tel != '' and dag != None:
+        resultaten = bests.find({'bestelnr': int(num), 'dagophalen': str(dag), 'telnr': tel})
+    elif num == None and dag == None:
         resultaten = bests.find({'telnr': tel})
-    elif num == '' and tel == '':
-        resultaten = bests.find({'dagophalen': dag})
+    elif num == None and tel == '':
+        print(dag)
+        print(type(dag))
+        resultaten = bests.find({'dagophalen': str(dag)})
     elif dag == None and tel == '':
         resultaten = bests.find({'bestelnr': int(num)})
-    elif num == '':
-        resultaten = bests.find({'dagophalen': dag, 'telnr': tel})
+    elif num == None:
+        resultaten = bests.find({'dagophalen': str(dag), 'telnr': tel})
     elif tel == '':
-        resultaten = bests.find({'bestelnr': int(num), 'dagophalen': dag})
+        resultaten = bests.find({'bestelnr': int(num), 'dagophalen': str(dag)})
     elif dag == None:
         resultaten = bests.find({'bestelnr': int(num), 'telnr': tel})
     return resultaten

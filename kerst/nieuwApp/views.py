@@ -97,8 +97,9 @@ def nieuw_bestel(request):
             nieuw_bestelnr = int(str_nieuw_bestelnr)
 
             doc = {
-                "email": email,
                 "bestelnr": nieuw_bestelnr,
+                "email": email,
+                "state": "niet_gestart",
                 "producten": []
             }
             bests.insert_one(doc)
@@ -468,4 +469,4 @@ def nieuw_keuze(request):
 
     else:
         return HttpResponse(
-            "sjongejonge dit is niet de bedoeling, hup ga weer terug naar home, toe maar, ga dan, komaan, tempo please")
+            "dit is niet de bedoeling, ga weer terug naar home")

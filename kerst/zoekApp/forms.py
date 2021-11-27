@@ -14,11 +14,11 @@ TYPE_DAY = (
     (25, "Alles")
 )
 TYPE_STATE = (
-    (0 , "Niet gestart"),
-    (1, "Bezig"),
-    (2, "Klaar"),
-    (3, "Problemen"),
-    (4, "Alles")
+    ("niet_gestart" , "Niet gestart"),
+    ("bezig", "Bezig"),
+    ("voltooid", "Klaar"),
+    ("probleem", "Problemen"),
+    ("Alles", "Alles")
 )
 
 class bestellingen(forms.Form):
