@@ -14,10 +14,21 @@ kerst_db = get_db('kerst_db')
 bests = kerst_db['bestellingen']
 prods = kerst_db['producten']
 
-obj_prods = prods.find({}, {'product': 1})
-prod_list = []
+alle_prodlist = []
+standaard_prodlist = []
+snijdvlees_prodlist = []
+
+obj_prods = prods.find({}, {'product': 1, 'snijdvlees': 1, 'cat': 1})
 for obj_prod in obj_prods:
-    prod_list.append(obj_prod['product'])
+    alle_prodlist.append(obj_prod['product'])
+
+    if obj_prod['cat'] in ['dry_aged', 'menu', 'zelf_gourmet']:
+        continue
+
+    if obj_prod['snijdvlees']:
+        snijdvlees_prodlist.append(obj_prod['product'])
+    else:
+        standaard_prodlist.append(obj_prod['product'])
 
 
 def index(request):
@@ -49,6 +60,13 @@ def kies_form(het_type):
         return DryAgedForm()
     elif het_type == 'standaard':
         return StandaardForm()
+
+
+def kies_prodlist(het_type):
+    if het_type == 'snijdvlees':
+        return snijdvlees_prodlist
+    else:
+        return standaard_prodlist
 
 
 def huidig_producten(bestelnr):
@@ -117,7 +135,7 @@ def nieuw_bestel(request):
                 'gekozen_type': gekozen_type,
                 'passed_bestelnr': nieuw_bestelnr,
                 'passed_email': email,
-                'products_list': prod_list,
+                'products_list': kies_prodlist(gekozen_type),
                 'product_form': kies_form(gekozen_type),
                 'speciale_optie_form': SpecialeOptieForm(),
                 'huidige_producten': huidig_producten(nieuw_bestelnr)
@@ -144,7 +162,7 @@ def bestel_done(request):
                 'gekozen_type': prod_type,
                 'passed_bestelnr': bestelnr,
                 'passed_email': email,
-                'products_list': prod_list,
+                'products_list': kies_prodlist(prod_type),
                 'product_form': kies_form(prod_type),
                 'speciale_optie_form': SpecialeOptieForm(),
                 'huidige_producten': huidig_producten(bestelnr)
@@ -191,23 +209,28 @@ def prod_toevoegen(request):
                 'gekozen_type': oude_type,
                 'passed_bestelnr': bestelnr,
                 'passed_email': email,
-                'products_list': prod_list,
+                'products_list': kies_prodlist(oude_type),
                 'product_form': kies_form(oude_type),
                 'speciale_optie_form': SpecialeOptieForm(),
                 'huidige_producten': huidig_producten(bestelnr)
             })
         elif form.is_valid():
             data = form.cleaned_data
-            nieuw_prod = data['product'].strip()
-            Product(nieuw_prod, data['cat']).insert()
-            prod_list.append(nieuw_prod)
+            nieuw_prod = data['product'].strip().lower()
+            Product(nieuw_prod, data['cat'], data['snijdvlees']).insert()
+
+            alle_prodlist.append(nieuw_prod)
+            if data['snijdvlees']:
+                snijdvlees_prodlist.append(nieuw_prod)
+            else:
+                standaard_prodlist.append(nieuw_prod)
 
             messages.success(request, f"Product '{nieuw_prod}' is aangemaakt!", extra_tags='w3-green')
             return render(request, 'nieuwApp/gekozenNieuw.html', {
                 'gekozen_type': oude_type,
                 'passed_bestelnr': bestelnr,
                 'passed_email': email,
-                'products_list': prod_list,
+                'products_list': kies_prodlist(oude_type),
                 'product_form': kies_form(oude_type),
                 'speciale_optie_form': SpecialeOptieForm(),
                 'huidige_producten': huidig_producten(bestelnr)
@@ -311,7 +334,7 @@ def speciale_optie(request):
                 'gekozen_type': nieuw_type,
                 'passed_bestelnr': bestelnr,
                 'passed_email': email,
-                'products_list': prod_list,
+                'products_list': kies_prodlist(nieuw_type),
                 'product_form': kies_form(nieuw_type),
                 'speciale_optie_form': SpecialeOptieForm(),
                 'huidige_producten': huidig_producten(bestelnr)
@@ -323,7 +346,7 @@ def speciale_optie(request):
                     'gekozen_type': oude_type,
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
-                    'products_list': prod_list,
+                    'products_list': kies_prodlist(oude_type),
                     'product_form': kies_form(oude_type),
                     'speciale_optie_form': SpecialeOptieForm(),
                     'huidige_producten': huidig_producten(bestelnr)
@@ -348,7 +371,7 @@ def nieuw_keuze(request):
         oude_type = request.POST['huidig_type']
         nieuw_type = request.POST['prod_type']
 
-        if request.POST['product'] not in prod_list:
+        if request.POST['product'] not in alle_prodlist:
             messages.info(request, 'Dit product staat nog niet in de database, vul dit in om het toe te voegen', extra_tags='w3-blue')
             return render(request, 'nieuwApp/nieuwProduct.html', {
                 'nieuw_prod': request.POST['product'],
@@ -379,7 +402,7 @@ def nieuw_keuze(request):
                     'gekozen_type': oude_type,
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
-                    'products_list': prod_list,
+                    'products_list': kies_prodlist(oude_type),
                     'product_form': SnijdForm(),
                     'speciale_optie_form': SpecialeOptieForm(),
                     'huidige_producten': huidig_producten(bestelnr)
@@ -406,7 +429,7 @@ def nieuw_keuze(request):
                     'gekozen_type': oude_type,
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
-                    'products_list': prod_list,
+                    'products_list': kies_prodlist(oude_type),
                     'product_form': form,
                     'speciale_optie_form': SpecialeOptieForm(),
                     'huidige_producten': huidig_producten(bestelnr)
@@ -439,7 +462,7 @@ def nieuw_keuze(request):
                     'gekozen_type': oude_type,
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
-                    'products_list': prod_list,
+                    'products_list': kies_prodlist(oude_type),
                     'product_form': form,
                     'speciale_optie_form': SpecialeOptieForm(),
                     'huidige_producten': huidig_producten(bestelnr)
@@ -456,7 +479,7 @@ def nieuw_keuze(request):
                     'gekozen_type': oude_type,
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
-                    'products_list': prod_list,
+                    'products_list': kies_prodlist(oude_type),
                     'product_form': form,
                     'speciale_optie_form': SpecialeOptieForm(),
                     'huidige_producten': huidig_producten(bestelnr)
@@ -473,7 +496,7 @@ def nieuw_keuze(request):
                     'gekozen_type': oude_type,
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
-                    'products_list': prod_list,
+                    'products_list': kies_prodlist(oude_type),
                     'product_form': form,
                     'speciale_optie_form': SpecialeOptieForm(),
                     'huidige_producten': huidig_producten(bestelnr)
@@ -492,7 +515,7 @@ def nieuw_keuze(request):
                 'gekozen_type': nieuw_type,
                 'passed_bestelnr': bestelnr,
                 'passed_email': email,
-                'products_list': prod_list,
+                'products_list': kies_prodlist(nieuw_type),
                 'product_form': kies_form(nieuw_type),
                 'speciale_optie_form': SpecialeOptieForm(),
                 'huidige_producten': huidig_producten(bestelnr)

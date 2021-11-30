@@ -8,12 +8,13 @@ prods = kerst_db['producten']
 
 
 class Product:
-    def __init__(self, product, cat):
+    def __init__(self, product, cat, snijdbaar):
         self.product = product
         self.cat = cat
+        self.snijdbaar = snijdbaar
 
     def insert(self):
-        prods.insert_one({"product": self.product, "cat": self.cat})
+        prods.insert_one({"product": self.product, "cat": self.cat, "snijdbaar": self.snijdbaar})
 
 
 class Snijdvlees:
