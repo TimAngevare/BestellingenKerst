@@ -27,8 +27,14 @@ def index(request):
 
 
 def nieuw(request):
+    fav_medewerker = request.COOKIES.get('fav_medewerker')
+    if fav_medewerker is not None:
+        inits = {'medewerker': fav_medewerker}
+    else:
+        inits = {}
+
     return render(request, 'nieuwApp/nieuw.html', {
-        'form': NieuweBestellingForm()
+        'form': NieuweBestellingForm(initial=inits)
     })
 
 
@@ -70,10 +76,12 @@ def nieuw_bestel(request):
     if request.method == 'POST':
         form = NieuweBestellingForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data['usr_email'].strip()
-            gekozen_type = form.cleaned_data['prod_type']
-            dag_ophalen = form.cleaned_data['dagophalen']
+            data = form.cleaned_data
+            email = data['usr_email'].strip()
+            gekozen_type = data['prod_type']
+            dag_ophalen = data['dagophalen']
 
+            # Nieuw bestelnummer maken
             obj_bestelnrs = bests.find({}, {'bestelnr': 1})
             list_bestelnrs = []
             for obj_bnr in obj_bestelnrs:
@@ -100,11 +108,12 @@ def nieuw_bestel(request):
                 "bestelnr": nieuw_bestelnr,
                 "email": email,
                 "state": "niet_gestart",
+                "medewerker": data['medewerker'],
                 "producten": []
             }
             bests.insert_one(doc)
 
-            return render(request, 'nieuwApp/gekozenNieuw.html', {
+            response = render(request, 'nieuwApp/gekozenNieuw.html', {
                 'gekozen_type': gekozen_type,
                 'passed_bestelnr': nieuw_bestelnr,
                 'passed_email': email,
@@ -113,6 +122,8 @@ def nieuw_bestel(request):
                 'speciale_optie_form': SpecialeOptieForm(),
                 'huidige_producten': huidig_producten(nieuw_bestelnr)
             })
+            response.set_cookie('fav_medewerker', data['medewerker'].strip().lower())
+            return response
         else:
             messages.error(request, "Je hebt niet alles ingevuld", extra_tags='w3-red')
             return render(request, 'nieuwApp/nieuw.html', {
@@ -236,13 +247,15 @@ def speciale_optie(request):
                     inc_doc['gewicht'] = int(product['gewicht']) * -1
                     for gewicht, aantal in snijden.items():
                         inc_doc['snijden.' + gewicht] = int(aantal) * -1
+                        inc_doc['snijden_detail.' + gewicht + '.' + bestelnr] = int(aantal) * -1
 
                 except KeyError:
                     cat_doc = prods.find_one({'product': prod_naam})
                     cat = cat_doc['cat']
                     if cat == 'zelf_gourmet':
-                        for prod, aantal in product['conf'].items():
-                            inc_doc['conf.' + prod] = int(aantal) * -1
+                        for prod, doc in product['conf'].items():
+                            ding = next(iter(doc))
+                            inc_doc['conf.' + prod + '.' + ding] = int(doc[ding]) * -1
 
                     elif cat == 'dry_aged':
                         inc_doc[product['soort']] = int(product['gewicht']) * -1
@@ -411,7 +424,13 @@ def nieuw_keuze(request):
 
                 for optie in menu_items:
                     int_optie = int(data[optie])
-                    if int_optie > 0: conf_doc[optie.replace("_", " ")] = int_optie
+
+                    if int_optie > 0:
+                        gemarineerd = data[optie + '_mar']
+                        if gemarineerd:
+                            conf_doc[optie] = {"gem": int_optie}
+                        else:
+                            conf_doc[optie] = {"nat": int_optie}
 
                 Gourmet('zelf_gourmet', conf_doc, data['bijz']).insert(bestelnr)
             else:

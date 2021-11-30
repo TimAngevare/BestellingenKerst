@@ -62,6 +62,10 @@ def standaard_aantal(prod_label):
                               ))
 
 
+def standaard_mar(prod_label):
+    return forms.BooleanField(label=mark_safe(prod_label), required=False)
+
+
 temp_product = forms.CharField(label="Product",
                                max_length=100,
                                widget=forms.TextInput(
@@ -101,6 +105,16 @@ class NieuweBestellingForm(forms.Form):
     usr_email = forms.EmailField(label="E-mail adres", max_length=100,
                                  widget=forms.EmailInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
     dagophalen = forms.ChoiceField(label="Dag ophalen", choices=DAGEN_OPHALEN_OPTION, widget=forms.RadioSelect())
+    medewerker = forms.CharField(label=mark_safe("<br />Medewerker"),
+                                 widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
+
+    # def __init__(self, *args, request=None, **kwargs):
+    #     super(NieuweBestellingForm, self).__init__(*args, **kwargs)
+    #     if request is not None:
+    #         try:
+    #             self.fields['medewerker'].value = request.COOKIES['fav_medewerker']
+    #         except KeyError:
+    #             pass
 
 
 class BestellingAfmakenForm(forms.Form):
@@ -149,25 +163,64 @@ class GourmetForm(forms.Form):
     # cat = "zelf_gourmet"
 
     bavette = standaard_aantal("<br />Bavette")
-    kogel_biefstuk = standaard_aantal("Kogel Biefstuk")
-    ossenhaaspuntjes = standaard_aantal("Ossenhaaspuntjes")
-    ba_hamburgers = standaard_aantal("Black Angus Hamburgers")
-    rundervink = standaard_aantal("Rundervink")
-    speklapjes = standaard_aantal("Speklapjes")
-    varkenshaassate = standaard_aantal("Varkenshaassate")
-    shoarma = standaard_aantal("Shoarma")
-    varkenshaas = standaard_aantal("Varkenshaas")
-    kip_bacon_chili = standaard_aantal("Kip Bacon Chili")
-    slavink = standaard_aantal("Slavink")
-    kipfilet = standaard_aantal("Kipfilet")
-    hamburger = standaard_aantal("Hamburger")
-    lamsrack = standaard_aantal("Lamsrack")
-    dry_aged = standaard_aantal("Dry Aged")
-    kalfsoester = standaard_aantal("Kalfsoester")
-    diamanthaas = standaard_aantal("Diamanthaas")
-    ba_cheddar = standaard_aantal("Black Angus Cheddar")
-    chipolata = standaard_aantal("Chipolata")
-    chinese_roaststeak = standaard_aantal("Chinese Roaststeak")
+    bavette_mar = standaard_mar("Bavette gemarineerd")
+
+    kogel_biefstuk = standaard_aantal("<br />Kogel Biefstuk")
+    kogel_biefstuk_mar = standaard_mar("Kogel Biefstuk gemarineerd")
+
+    ossenhaaspuntjes = standaard_aantal("<br />Ossenhaaspuntjes")
+    ossenhaaspuntjes_mar = standaard_mar("Ossenhaaspuntjes gemarineerd")
+
+    ba_hamburgers = standaard_aantal("<br />Black Angus Hamburgers")
+    ba_hamburgers_mar = standaard_mar("Black Angus gemarineerd")
+
+    rundervink = standaard_aantal("<br />Rundervink")
+    rundervink_mar = standaard_mar("Rundervink gemarineerd")
+
+    speklapjes = standaard_aantal("<br />Speklapjes")
+    speklapjes_mar = standaard_mar("Speklapjes gemarineerd")
+
+    varkenshaassate = standaard_aantal("<br />Varkenshaassate")
+    varkenshaassate_mar = standaard_mar("Varkenshaassate gemarineerd")
+
+    shoarma = standaard_aantal("<br />Shoarma")
+    shoarma_mar = standaard_mar("Shoarma gemarineerd")
+
+    varkenshaas = standaard_aantal("<br />Varkenshaas")
+    varkenshaas_mar = standaard_mar("Varkenshaas gemarineerd")
+
+    kip_bacon_chili = standaard_aantal("<br />Kip Bacon Chili")
+    kip_bacon_chili_mar = standaard_mar("Kip Bacon Chili gemarineerd")
+
+    slavink = standaard_aantal("<br />Slavink")
+    slavink_mar = standaard_mar("Slavink gemarineerd")
+
+    kipfilet = standaard_aantal("<br />Kipfilet")
+    kipfilet_mar = standaard_mar("Kipfilet gemarineerd")
+
+    hamburger = standaard_aantal("<br />Hamburger")
+    hamburger_mar = standaard_mar("Hamburger gemarineerd")
+
+    lamsrack = standaard_aantal("<br />Lamsrack")
+    lamsrack_mar = standaard_mar("Lamsrack gemarineerd")
+
+    dry_aged = standaard_aantal("<br />Dry Aged")
+    dry_aged_mar = standaard_mar("Dry Aged gemarineerd")
+
+    kalfsoester = standaard_aantal("<br />Kalfsoester")
+    kalfsoester_mar = standaard_mar("Kalfsoester gemarineerd")
+
+    diamanthaas = standaard_aantal("<br />Diamanthaas")
+    diamanthaas_mar = standaard_mar("Diamanthaas gemarineerd")
+
+    ba_cheddar = standaard_aantal("<br />Black Angus Cheddar")
+    ba_cheddar_mar = standaard_mar("Black Angus Cheddar gemarineerd")
+
+    chipolata = standaard_aantal("<br />Chipolata")
+    chipolata_mar = standaard_mar("Chipolata gemarineerd")
+
+    chinese_roaststeak = standaard_aantal("<br />Chinese Roaststeak")
+    chinese_roaststeak_mar = standaard_mar("Chinese Roaststeak gemarineerd")
 
     bijz = temp_bijz
     prod_type = temp_prod_type

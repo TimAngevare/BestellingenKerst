@@ -110,8 +110,8 @@ class Gourmet:
         incs = {}
 
         for key, value in self.conf.items():
-            nieuw_key = 'conf.' + key
-            incs[nieuw_key] = value
+            ding = next(iter(value))
+            incs['conf.' + key + '.' + ding] = value[ding]
 
         if self.bijz:
             new_doc['bijz'] = self.bijz
