@@ -36,6 +36,9 @@ class Snijdvlees:
             nieuw_key = 'snijden.' + key
             incs[nieuw_key] = value
 
+            detail_key = 'snijden_detail.' + str(key) + '.' + str(bestelnr)
+            incs[detail_key] = value
+
         if self.bijz:
             new_doc['bijz'] = self.bijz
             prods.update_one({'product': self.product},

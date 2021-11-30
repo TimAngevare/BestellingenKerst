@@ -2,12 +2,9 @@
 
 {% block content %}
 
-{% if error_message %}<div class="w3-panel w3-red w3-container"><p>{{ error_message }}</p></div>{% endif %}
-
 <div class="w3-card w3-container">
         <header class="w3-container w3-blue-grey">
-            <h3>Zeker? - {{nieuw_prod}}</h3>
-            <p>Dit product staat nog niet in het systeem. Herhaal de naam om het toe te voegen.</p>
+            <h3>Nieuw product toevoegen {% if nieuw_prod %}({{nieuw_prod}}){% endif %}</h3>
         </header>
         <form autocomplete="off" spellcheck="false" action="{% url 'nieuwApp:producttoevoegen' %}" method="post" class="w3-container w3-margin">
             {% csrf_token %}

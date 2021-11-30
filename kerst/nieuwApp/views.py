@@ -114,11 +114,10 @@ def nieuw_bestel(request):
                 'huidige_producten': huidig_producten(nieuw_bestelnr)
             })
         else:
-            messages.error(request, "niet alles ingevuld")
-        return render(request, 'nieuwApp/nieuw.html', {
-            'product_form': form,
-            'speciale_optie_form': SpecialeOptieForm()
-        })
+            messages.error(request, "Je hebt niet alles ingevuld", extra_tags='w3-red')
+            return render(request, 'nieuwApp/nieuw.html', {
+                'form': form
+            })
     else:
         return HttpResponse("Wejow gek dit kan niet zomaar he.")
 
@@ -154,10 +153,11 @@ def bestel_done(request):
                          }
             })
 
+            messages.success(request, f'Bestelling #{bestelnr} is aangemaakt!', extra_tags='w3-green')
             return HttpResponseRedirect('/')
         else:
+            messages.error(request, 'Oeps, er is iets mis. Probeer het aub opnieuw', extra_tags='w3-red')
             return render(request, 'nieuwApp/bestellingAfmaken.html', {
-                'error_message': 'Oeps er is iets mis, waarschijnlijk heb je het telefoonnummer of de tijd van ophalen niet correct ingevoerd.',
                 'passed_bestelnr': request.POST['bestelnr'],
                 'passed_email': request.POST['usr_email'],
                 'form': BestellingAfmakenForm(),
@@ -191,6 +191,7 @@ def prod_toevoegen(request):
             Product(nieuw_prod, data['cat']).insert()
             prod_list.append(nieuw_prod)
 
+            messages.success(request, f"Product '{nieuw_prod}' is aangemaakt!", extra_tags='w3-green')
             return render(request, 'nieuwApp/gekozenNieuw.html', {
                 'gekozen_type': oude_type,
                 'passed_bestelnr': bestelnr,
@@ -201,8 +202,8 @@ def prod_toevoegen(request):
                 'huidige_producten': huidig_producten(bestelnr)
             })
         else:
+            messages.error(request, 'Oeps, er is iets mis. Probeer het aub opnieuw', extra_tags='w3-red')
             return render(request, 'nieuwApp/nieuwProduct.html', {
-                'error_message': 'Oeps, er klopt iets niet. Probeer het even opnieuw',
                 'nieuw_prod': request.POST['product'],
                 'gekozen_type': oude_type,
                 'passed_bestelnr': bestelnr,
@@ -271,11 +272,20 @@ def speciale_optie(request):
                     prods.update_one({'product': prod_naam}, {'$inc': inc_doc})
 
             bests.delete_one({'bestelnr': bestelnr})
+            messages.success(request, f'Bestelling #{bestelnr} is verwijderd!', extra_tags='w3-green')
             return HttpResponseRedirect('/')
 
         elif request.POST['done'] == 'Nieuw product toevoegen':
             return render(request, 'nieuwApp/nieuwProduct.html', {
                 'nieuw_prod': request.POST['product'],
+                'gekozen_type': oude_type,
+                'passed_bestelnr': bestelnr,
+                'passed_email': email,
+                'form': ProductForm()
+            })
+
+        elif request.POST['done'] == 'Nieuw product':
+            return render(request, 'nieuwApp/nieuwProduct.html', {
                 'gekozen_type': oude_type,
                 'passed_bestelnr': bestelnr,
                 'passed_email': email,
@@ -295,6 +305,7 @@ def speciale_optie(request):
             })
         elif request.POST['done'] == 'Negeren en afronden':
             if huidig_producten(bestelnr) == 'Nog geen producten toegevoegd':
+                messages.error(request, 'Je hebt nog geen producten toegevoegd, dus je kan de bestelling ook niet afronden', extra_tags='w3-red')
                 return render(request, 'nieuwApp/gekozenNieuw.html', {
                     'gekozen_type': oude_type,
                     'passed_bestelnr': bestelnr,
@@ -325,6 +336,7 @@ def nieuw_keuze(request):
         nieuw_type = request.POST['prod_type']
 
         if request.POST['product'] not in prod_list:
+            messages.info(request, 'Dit product staat nog niet in de database, vul dit in om het toe te voegen', extra_tags='w3-blue')
             return render(request, 'nieuwApp/nieuwProduct.html', {
                 'nieuw_prod': request.POST['product'],
                 'gekozen_type': oude_type,
@@ -349,8 +361,8 @@ def nieuw_keuze(request):
 
                 Snijdvlees(data['product'], int(data['gewicht']), snijd_obj, data['bijz']).insert(bestelnr)
             else:
+                messages.error(request, 'Oeps, er is iets mis. Probeer het aub opnieuw', extra_tags='w3-red')
                 return render(request, 'nieuwApp/gekozenNieuw.html', {
-                    'error_message': 'Oeps er is iets mis, waarschijnlijk heb je snijden niet correct ingevoerd. De correcte manier is (zovaak als je wil): (gewicht):(aantal),',
                     'gekozen_type': oude_type,
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
@@ -376,8 +388,8 @@ def nieuw_keuze(request):
                 Menu('traditioneel_kerstmenu', int(data['aantal']), v_gerecht_doc, 'beef_wellington', 'dessert_buffet', data['bijz']).insert(bestelnr)
 
             else:
+                messages.error(request, 'Oeps, er is iets mis. Probeer het aub opnieuw', extra_tags='w3-red')
                 return render(request, 'nieuwApp/gekozenNieuw.html', {
-                    'error_message': 'Oeps, er is iets mis gegaan. Waarschijnlijk heb je niet een menu-product gekozen.',
                     'gekozen_type': oude_type,
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
@@ -403,8 +415,8 @@ def nieuw_keuze(request):
 
                 Gourmet('zelf_gourmet', conf_doc, data['bijz']).insert(bestelnr)
             else:
+                messages.error(request, 'Oeps, er is iets mis. Probeer het aub opnieuw', extra_tags='w3-red')
                 return render(request, 'nieuwApp/gekozenNieuw.html', {
-                    'error_message': 'Oeps, er is iets mis gegaan. Check je inputs en probeer het aub opnieuw.',
                     'gekozen_type': oude_type,
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
@@ -420,8 +432,8 @@ def nieuw_keuze(request):
                 data = form.cleaned_data
                 DryAgedVlees(data['product'], data['soort'], data['gewicht'], data['bijz']).insert(bestelnr)
             else:
+                messages.error(request, 'Oeps, er is iets mis. Probeer het aub opnieuw', extra_tags='w3-red')
                 return render(request, 'nieuwApp/gekozenNieuw.html', {
-                    'error_message': 'Oeps, er is iets mis gegaan. Check je inputs en probeer het aub opnieuw.',
                     'gekozen_type': oude_type,
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
@@ -437,8 +449,8 @@ def nieuw_keuze(request):
                 data = form.cleaned_data
                 Standaard(data['product'], data['aantal'], data['bijz']).insert(bestelnr)
             else:
+                messages.error(request, 'Oeps, er is iets mis. Probeer het aub opnieuw', extra_tags='w3-red')
                 return render(request, 'nieuwApp/gekozenNieuw.html', {
-                    'error_message': 'Oeps, er is iets mis gegaan. Check je inputs en probeer het aub opnieuw.',
                     'gekozen_type': oude_type,
                     'passed_bestelnr': bestelnr,
                     'passed_email': email,
@@ -468,5 +480,4 @@ def nieuw_keuze(request):
             })
 
     else:
-        return HttpResponse(
-            "dit is niet de bedoeling, ga weer terug naar home")
+        return HttpResponse("dit is niet de bedoeling, ga weer terug naar home")
