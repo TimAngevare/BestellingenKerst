@@ -13,27 +13,13 @@ TYPE_OPTION = (
     ("menu", "Traditioneel Kerstmenu"),
     ("zelf_gourmet", "Gourmet"),
     ("dry_aged", "Dry Aged Vlees"),
+    ("rollade", "Rollade"),
 )
-
-# FORMAAT_OPTION = (
-#     ('klein', 'Klein'),
-#     ('groot', 'Groot'),
-# )
 
 DAGEN_OPHALEN_OPTION = [
     ('23', '23-12'),
     ('24', '24-12')
 ]
-
-# FORMAAT_PROD_OPTION = (
-#     ('de_tapas_plank', 'De Tapas Plank'),
-#     ('de_party_pan', 'De Party Pan'),
-# )
-
-# MENU_OPTION = (
-#     ('dorpsslagers kerstmenu', 'Het Dorpsslagers Kerstmenu'),
-#     ('traditioneel kerstmenu', 'Het Traditioneel Kerstmenu'),
-# )
 
 SOORT_OPTION = (
     ('ribeye', 'Ribeye'),
@@ -51,6 +37,20 @@ DRYAGED_OPTION = (
     ('west_vlaams_rood', 'West Vlaams Rood'),
     ('simmentaler_oostenrijk', 'Simmentaler Oostenrijk'),
     ('australisch_angus', 'Australisch Angus'),
+)
+
+ROLLADE_OPTION = (
+    ('varkensschouder_rollade', 'Varkensschouder Rollade'),
+    ('varkensfilet_rollade', 'Varkensfilet Rollade'),
+    ('buikspek_rollade', 'Buikspek Rollade'),
+    ('half_om_half_rollade', 'Half om Half Rollade'),
+    ('runderstoof_rollade', 'Runderstoof Rollade'),
+    ('rollade_van_het_staartstuk', 'Rollade van het Staartstuk'),
+    ('kalfslende_rollade', 'Kalfslende Rollade'),
+    ('runderlende_rollade', 'Runderlende Rollade'),
+    ('lamsbilletje_rollade', 'Lamsbilletje Rollade'),
+    ('kip_rollade', 'Kip Rollade'),
+    ('kalkoendij_rollade', 'Kalkoendij Rollade'),
 )
 
 
@@ -244,5 +244,17 @@ class StandaardForm(forms.Form):
     product = temp_product
     aantal = temp_aantal
 
+    bijz = temp_bijz
+    prod_type = temp_prod_type
+
+
+class RolladeForm(forms.Form):
+    product = forms.ChoiceField(label="Product", choices=ROLLADE_OPTION,
+                                widget=forms.Select(attrs={'class': 'w3-select'}))
+    gewicht = forms.IntegerField(label="Gewicht", min_value=500, widget=forms.NumberInput(
+                                      attrs={'class': 'w3-input w3-border w3-light-grey'}))
+
+    gekruid = forms.BooleanField(label="Gekruid", required=False, widget=forms.CheckboxInput(
+        attrs={'class': 'w3-checkbox w3-input'}))
     bijz = temp_bijz
     prod_type = temp_prod_type

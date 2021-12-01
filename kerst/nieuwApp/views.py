@@ -22,7 +22,7 @@ obj_prods = prods.find({}, {'product': 1, 'snijdvlees': 1, 'cat': 1})
 for obj_prod in obj_prods:
     alle_prodlist.append(obj_prod['product'])
 
-    if obj_prod['cat'] in ['dry_aged', 'menu', 'zelf_gourmet']:
+    if obj_prod['cat'] in ['dry_aged', 'menu', 'zelf_gourmet', 'rollade']:
         continue
 
     if obj_prod['snijdvlees']:
@@ -60,6 +60,8 @@ def kies_form(het_type):
         return DryAgedForm()
     elif het_type == 'standaard':
         return StandaardForm()
+    elif het_type == 'rollade':
+        return RolladeForm()
 
 
 def kies_prodlist(het_type):
@@ -80,7 +82,11 @@ def huidig_producten(bestelnr):
                 try:
                     return_string += product['product'] + " (" + str(product['gewicht']) + " gr.), "
                 except KeyError:
-                    return_string += product['product'] + ", "
+                    prod = product['product']
+                    if prod == 'zelf_gourmet':
+                        prod = 'gourmet eigen conf.'
+
+                    return_string += prod + ", "
     else:
         return_string = "Nog geen producten toegevoegd"
 
@@ -293,12 +299,20 @@ def speciale_optie(request):
                         inc_doc['hoofdgerecht.beef_wellington'] = aantal * -1
                         inc_doc['dessert.dessert_buffet'] = aantal * -1
 
+                    elif cat == 'rollade':
+                        int_gewicht = int(product['gewicht'])
+                        inc_doc['gewicht'] = int_gewicht * -1
+
+                        if product['gekruid']:
+                            inc_doc['gekruid.ja'] = int_gewicht * -1
+                        else:
+                            inc_doc['gekruid.nee'] = int_gewicht * -1
+
                     else:
                         inc_doc['aantal'] = int(product['aantal']) * -1
 
                 try:
                     bijz = product['bijz']
-                    print('nu ga ik verwijderen')
 
                     result = prods.update_one({'product': prod_naam}, {'$inc': inc_doc,
                                                                        '$pull': {'bijz': {str(bestelnr): bijz}}})
@@ -490,6 +504,23 @@ def nieuw_keuze(request):
             if form.is_valid():
                 data = form.cleaned_data
                 Standaard(data['product'], data['aantal'], data['bijz']).insert(bestelnr)
+            else:
+                messages.error(request, 'Oeps, er is iets mis. Probeer het aub opnieuw', extra_tags='w3-red')
+                return render(request, 'nieuwApp/gekozenNieuw.html', {
+                    'gekozen_type': oude_type,
+                    'passed_bestelnr': bestelnr,
+                    'passed_email': email,
+                    'products_list': kies_prodlist(oude_type),
+                    'product_form': form,
+                    'speciale_optie_form': SpecialeOptieForm(),
+                    'huidige_producten': huidig_producten(bestelnr)
+                })
+
+        elif oude_type == 'rollade':
+            form = RolladeForm(request.POST)
+            if form.is_valid():
+                data = form.cleaned_data
+                Rollade(data['product'], data['gewicht'], data['gekruid'], data['bijz']).insert(bestelnr)
             else:
                 messages.error(request, 'Oeps, er is iets mis. Probeer het aub opnieuw', extra_tags='w3-red')
                 return render(request, 'nieuwApp/gekozenNieuw.html', {

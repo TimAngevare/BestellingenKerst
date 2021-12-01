@@ -182,3 +182,34 @@ class Standaard:
             prods.update_one({'product': self.product}, {'$inc': incs}, upsert=True)
 
         bests.update_one({'bestelnr': bestelnr}, {"$push": {"producten": new_doc}})
+
+
+class Rollade:
+    def __init__(self, product, gewicht, gekruid, bijz):
+        self.product = product
+        self.gewicht = gewicht
+        self.gekruid = gekruid
+        self.bijz = bijz
+
+    def insert(self, bestelnr):
+        new_doc = {
+            'product': self.product,
+            'gewicht': self.gewicht,
+            'gekruid': self.gekruid
+        }
+
+        incs = {'gewicht': self.gewicht}
+
+        if self.gekruid:
+            incs['gekruid.ja'] = self.gewicht
+        else:
+            incs['gekruid.nee'] = self.gewicht
+
+        if self.bijz:
+            new_doc['bijz'] = self.bijz
+            prods.update_one({'product': self.product}, {'$inc': incs, '$push': {'bijz': {str(bestelnr): self.bijz}}},
+                             upsert=True)
+        else:
+            prods.update_one({'product': self.product}, {'$inc': incs}, upsert=True)
+
+        bests.update_one({'bestelnr': bestelnr}, {"$push": {"producten": new_doc}})
