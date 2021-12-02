@@ -34,10 +34,22 @@ def bestellingen(request):
 def producten(request):
     if request.method == "POST":
         producten_form = forms.producten(request.POST)
+        for key in request.POST.keys():
+            print(key)
+            if key.startswith('voltooi-'):
+                prod = key[8:]
+                mongo_manage.update_state_prod(prod, 'voltooid' )
+            elif key.startswith('probleem-'):
+                prod = key[9:]
+                mongo_manage.update_state_prod(prod, 'probleem' )
+            elif key.startswith('behandeling-'):
+                prod = key[12:]
+                mongo_manage.update_state(prod, 'bezig' )
         if producten_form.is_valid():
             typ_prod = producten_form.cleaned_data["temp_prod_type"]
             prod = producten_form.cleaned_data["temp_product"]
-            resultaten = mongo_manage.zoek_prod(typ_prod, prod)
+            state = producten_form.cleaned_data["state"]
+            resultaten = mongo_manage.zoek_prod({'cat' : typ_prod, 'product' : prod, 'state' : state})
             totaal = resultaten.count()
             return render(request, 'zoekApp/producten_results.html', {"resultaten": resultaten, "totaal" : totaal}) 
         else:
@@ -68,13 +80,13 @@ def alles_result(request):
             print(key)
             if key.startswith('voltooi-'):
                 bestel_nmr = key[8:]
-                mongo_manage.update_state(int(bestel_nmr) , 'voltooid' )
+                mongo_manage.update_state_best(int(bestel_nmr) , 'voltooid' )
             elif key.startswith('probleem-'):
                 bestel_nmr = key[9:]
-                mongo_manage.update_state(int(bestel_nmr) , 'probleem' )
+                mongo_manage.update_state_best(int(bestel_nmr) , 'probleem' )
             elif key.startswith('behandeling-'):
                 bestel_nmr = key[12:]
-                mongo_manage.update_state(int(bestel_nmr) , 'bezig' )
+                mongo_manage.update_state_best(int(bestel_nmr) , 'bezig' )
     dag = request.GET['dag']
     state = request.GET['state']
     resultaten = mongo_manage.zoek_best_alles(dag, state)

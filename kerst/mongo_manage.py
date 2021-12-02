@@ -15,12 +15,13 @@ def verwijder_best():
     else:
         print("Het gaat helemaal mis, het is niet gelukt.")
 
-def zoek_prod(typ_prod, prod):
-    if prod != '':
-        resultaten = prods.find({'cat' : typ_prod, 'product' : prod})
-    else:
-        resultaten = prods.find({'cat' : typ_prod})
-    return resultaten
+def zoek_prod(dict):
+    new_dict = {}
+    for key, value in dict.items():
+        if value != '' and value != None and value != "Alles":
+            new_dict[key] = value
+    print(new_dict)
+    return prods.find(new_dict)
 
 def zoek_best_alles(dag, state):
     if dag != '25' and state != "Alles":
@@ -33,8 +34,11 @@ def zoek_best_alles(dag, state):
         resultaten = bests.find({})
     return resultaten
 
-def update_state(num, state):
+def update_state_best(num, state):
     bests.update_one({'bestelnr' : num}, {'$set' : {'state' : state}}, upsert=False)
+
+def update_state_prod(prod, state):
+    bests.update_one({'product' : prod}, {'$set' : {'state' : state}}, upsert=False)
 
 def zoek_best(dict):
     new_dict = {}

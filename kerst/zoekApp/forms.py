@@ -39,6 +39,12 @@ class producten(forms.Form):
                                widget=forms.TextInput(
                                    attrs={'class': 'w3-input w3-border w3-light-grey', 'list': 'products'}
                                ))
+    state = forms.ChoiceField(label=mark_safe("eigenschap"),
+                                   choices=TYPE_STATE,
+                                   required=True,
+                                   widget=forms.Select(
+                                       attrs={'class': 'w3-select'}
+                                   ))
 class alles(forms.Form):
     dag = forms.ChoiceField(label=mark_safe("dag"),
                                    choices=TYPE_DAY,

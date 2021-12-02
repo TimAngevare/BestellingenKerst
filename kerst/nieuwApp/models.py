@@ -14,7 +14,7 @@ class Product:
         self.snijdbaar = snijdbaar
 
     def insert(self):
-        prods.insert_one({"product": self.product, "cat": self.cat, "snijdbaar": self.snijdbaar})
+        prods.insert_one({"product": self.product, "cat": self.cat, "snijdbaar": self.snijdbaar, "state" : "niet_gestart"})
 
 
 class Snijdvlees:
@@ -64,6 +64,7 @@ class Menu:
 
     def insert(self, bestelnr):
         new_doc = {
+            'state': 'niet_gestart',
             'product': self.product,
             'aantal': self.aantal,
             'voorgerecht': self.voorgerecht,
@@ -105,6 +106,7 @@ class Gourmet:
 
     def insert(self, bestelnr):
         new_doc = {
+            'state': 'niet_gestart',
             'product': self.product,
             'conf': self.conf,
         }
@@ -139,6 +141,7 @@ class DryAgedVlees:
 
     def insert(self, bestelnr):
         new_doc = {
+            'state': 'niet_gestart',
             'product': self.product,
             'soort': self.soort,
             'gewicht': self.gewicht,
@@ -171,6 +174,7 @@ class Standaard:
         new_doc = {
             'product': self.product,
             'aantal': self.aantal,
+            'state': 'niet_gestart'
         }
 
         incs = {'aantal': self.aantal}
@@ -196,7 +200,8 @@ class Rollade:
         new_doc = {
             'product': self.product,
             'gewicht': self.gewicht,
-            'gekruid': self.gekruid
+            'gekruid': self.gekruid,
+            'state': 'niet_gestart'
         }
 
         incs = {'gewicht': self.gewicht}
