@@ -28,7 +28,9 @@ TYPE_OPTION = (
 TYPE_DAY = (
     (23, 23),
     (24, 24),
-    (25, "Alles")
+    (25, 25),
+    (26, 26),
+    ('', "Alles")
 )
 TYPE_STATE = (
     ("niet_gestart" , "Niet gestart"),
@@ -40,7 +42,7 @@ TYPE_STATE = (
 
 class bestellingen(forms.Form):
     bestel_nmr = forms.IntegerField(required=False, min_value=1, max_value=30000)
-    dag_ophalen = forms.IntegerField(required=False, min_value=23, max_value=25)
+    dag_ophalen = forms.IntegerField(required=False, min_value=23, max_value=26)
     tel = forms.CharField(required=False, max_length=12, min_length=12)
     naam = forms.CharField(required=False, min_length=3)
 

@@ -31,7 +31,7 @@ def zoek_prod(dict):
 def zoek_best_alles(dict):
     new_dict = {}
     for key, value in dict.items():
-        if value == '' or value is None:
+        if value == '' or value == "Alles":
             continue
         elif key == 'dagophalen':
             new_dict['dagophalen'] = str(value)

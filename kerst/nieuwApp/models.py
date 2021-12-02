@@ -14,7 +14,7 @@ class Product:
         self.snijdbaar = snijdbaar
 
     def insert(self):
-        prods.insert_one({"product": self.product, "cat": self.cat, "snijdbaar": self.snijdbaar, "state" : "niet_gestart"})
+        prods.insert_one({"product": self.product, "cat": self.cat, "snijdvlees": self.snijdbaar, "state" : "niet_gestart"})
 
 
 class Snijdvlees:

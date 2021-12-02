@@ -19,7 +19,7 @@
                                 <ul class="w3-ul w3-border">
                                 {% if property == "product"%}
                                     <li><h4><b>{{detail}}</b></h4></li>
-                                {% else%}
+                                {% elif property != "state"%}
                                     <li>{{property}} : {{detail}}</li>
                                 {% endif %}
                                 </ul>
