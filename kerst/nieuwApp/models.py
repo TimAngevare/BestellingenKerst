@@ -26,6 +26,7 @@ class Snijdvlees:
 
     def insert(self, bestelnr):
         new_doc = {
+            'state': 'niet_gestart',
             'product': self.product,
             'gewicht': self.gewicht,
             'snijden': self.snijden,

@@ -25,6 +25,7 @@ class bestellingen(forms.Form):
     bestel_nmr = forms.IntegerField(required=False, min_value=1, max_value=30000)
     dag_ophalen = forms.IntegerField(required=False, min_value=23, max_value=25)
     tel = forms.CharField(required=False, max_length=12, min_length=12)
+    naam = forms.CharField(required=False, min_length=3)
 
 class producten(forms.Form):
     temp_prod_type = forms.ChoiceField(label=mark_safe("Type product"),

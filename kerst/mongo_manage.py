@@ -36,24 +36,20 @@ def zoek_best_alles(dag, state):
 def update_state(num, state):
     bests.update_one({'bestelnr' : num}, {'$set' : {'state' : state}}, upsert=False)
 
-def zoek_best(num, tel, dag):
-    if num != None and tel != '' and dag != None:
-        resultaten = bests.find({'bestelnr': int(num), 'dagophalen': str(dag), 'telnr': tel})
-    elif num == None and dag == None:
-        resultaten = bests.find({'telnr': tel})
-    elif num == None and tel == '':
-        print(dag)
-        print(type(dag))
-        resultaten = bests.find({'dagophalen': str(dag)})
-    elif dag == None and tel == '':
-        resultaten = bests.find({'bestelnr': int(num)})
-    elif num == None:
-        resultaten = bests.find({'dagophalen': str(dag), 'telnr': tel})
-    elif tel == '':
-        resultaten = bests.find({'bestelnr': int(num), 'dagophalen': str(dag)})
-    elif dag == None:
-        resultaten = bests.find({'bestelnr': int(num), 'telnr': tel})
-    return resultaten
+def zoek_best(dict):
+    new_dict = {}
+    for key, value in dict.items():
+        if value == '' or value == None:
+            continue
+        elif key == 'bestelnr':
+            new_dict['bestelnr'] = int(value)
+            print("ik kom!!")
+        elif key == 'dagophalen':
+            new_dict['dagophalen'] = str(value)
+        else:
+            new_dict.update({key : value})
+    print(new_dict)
+    return bests.find(new_dict)
 
 
 def cat_toevoegen():

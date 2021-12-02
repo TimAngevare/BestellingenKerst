@@ -15,7 +15,8 @@ def bestellingen(request):
             num = bestel_form.cleaned_data["bestel_nmr"]
             tel = bestel_form.cleaned_data["tel"]
             dag = bestel_form.cleaned_data["dag_ophalen"]
-            resultaten = mongo_manage.zoek_best(num, tel, dag)
+            naam = bestel_form.cleaned_data["naam"]
+            resultaten = mongo_manage.zoek_best({'bestelnr' : num, 'telnr' : tel, 'dagophalen' : dag, 'naam' : naam})
             totaal = resultaten.count()
             return render(request, 'zoekApp/bestellingen_results.html', {"resultaten": resultaten, "totaal" : totaal}) 
         else:

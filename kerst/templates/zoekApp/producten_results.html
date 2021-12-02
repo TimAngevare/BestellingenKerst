@@ -16,6 +16,12 @@
                 <div class="w3-container">
                     <ul class="w3-ul w3-border">
                         {% if key == "product"%}
+                            <form method="post" action="">
+                                {% csrf_token %}
+                                <button name= "voltooi-{{value}}" class="w3-button w3-green w3-margin w3-round-large" type="submit">Voltooi</button>
+                                <button name= "probleem-{{value}}" class="w3-button w3-red w3-margin w3-round-large">Probleem</button>
+                                <button name= "behanldeling-{{value}}" class="w3-button w3-orange w3-margin w3-round-large">Neem in behandeling</button>
+                            </form>
                             <li><h4><b>{{value}}</b></h4></li>
                         {% elif key != "_id"%}
                             <li><p>{{ key }} : {{ value }}</p></li>
