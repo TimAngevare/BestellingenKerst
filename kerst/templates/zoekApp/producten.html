@@ -8,6 +8,11 @@
     <form method="post" action="{% url 'zoekApp:producten' %}">
         {% csrf_token %}
         {{producten_form}}
+        <datalist id="products">
+            {% for prod in products_list %}
+                <option value="{{prod}}">
+            {% endfor %}
+        </datalist>
         <button type="submit", name="save">Zoek</button>
     </form>
 </div>

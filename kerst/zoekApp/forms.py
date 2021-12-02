@@ -1,13 +1,30 @@
 from django import forms
 from django.utils.safestring import mark_safe
+import mongo_manage
 
 TYPE_OPTION = (
-    ("standaard", "Standaard"),
-    ("snijdvlees", "Snijdbaar vlees"),
     ("menu", "Menu"),
     ("gourmet", "Gourmet"),
-    ("dryaged", "Dry Aged Vlees"),
+    ("dry_aged", "Dry Aged Vlees"),
+    ("bbq", "BBQ"),
+    ("bijgerecht", "Bijgerecht"),
+    ("borrel", "Borrel"),
+    ("dessert", "Dessert"),
+    ("gevogelte", "Gevogelte"),
+    ("hoofdgerecht", "Hoofdgerecht"),
+    ("kalf", "Kalf"),
+    ("koud_voorgerecht", "Koude voorgerechten"),
+    ("lam", "Lam"),
+    ("rollade", "Rollade"),
+    ("rund", "Rund"),
+    ("varken", "Varken"),
+    ("wagyu", "Wagyu"),
+    ("warm_voorgerecht", "Warme voorgerechten"),
+    ("wild", "Wild"),
+    ("zelf_gourmet", "Zelf Gourmet"),
+    ("anders", "overig")
 )
+
 TYPE_DAY = (
     (23, 23),
     (24, 24),
@@ -37,7 +54,7 @@ class producten(forms.Form):
                                max_length=100,
                                required=False,
                                widget=forms.TextInput(
-                                   attrs={'class': 'w3-input w3-border w3-light-grey', 'list': 'products'}
+                                   attrs={'class': 'w3-input w3-border w3-light-grey', 'list': 'products', 'spellcheck' : 'false'}
                                ))
     state = forms.ChoiceField(label=mark_safe("eigenschap"),
                                    choices=TYPE_STATE,

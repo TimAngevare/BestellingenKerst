@@ -4,6 +4,10 @@ from django.contrib import messages
 from . import forms
 import mongo_manage
 
+from nieuwApp.views import alle_prodlist
+
+PROD = alle_prodlist
+
 def zoek(request):
     return render(request, 'zoekApp/zoek.html')
 
@@ -16,48 +20,50 @@ def bestellingen(request):
             tel = bestel_form.cleaned_data["tel"]
             dag = bestel_form.cleaned_data["dag_ophalen"]
             naam = bestel_form.cleaned_data["naam"]
-            resultaten = mongo_manage.zoek_best({'bestelnr' : num, 'telnr' : tel, 'dagophalen' : dag, 'naam' : naam})
-            totaal = resultaten.count()
-            return render(request, 'zoekApp/bestellingen_results.html', {"resultaten": resultaten, "totaal" : totaal}) 
+            resultaten = mongo_manage.zoek_best({'bestelnr': num, 'telnr': tel, 'dagophalen': dag, 'naam': naam})
+            totaal = resultaten[0]
+            return render(request, 'zoekApp/bestellingen_results.html', {"resultaten": resultaten[1], "totaal": totaal})
         else:
             messages.error(request, "Hier klopt iets niet, vul opnieuw in")
-        #return HttpResponse("zoekApp/bestellingen_results.html") 
+        # return HttpResponse("zoekApp/bestellingen_results.html")
     else:
         bestel_form = forms.bestellingen()
     return render(request, 'zoekApp/bestellingen.html', {"bestel_form": bestel_form})
 
 
-#def bestellingen_resultaten(request):
-    #return render(request, 'zoekApp/bestellingen_results.html', {"resultaten": resultaten})
+# def bestellingen_resultaten(request):
+# return render(request, 'zoekApp/bestellingen_results.html', {"resultaten": resultaten})
 
 
 def producten(request):
     if request.method == "POST":
         producten_form = forms.producten(request.POST)
         for key in request.POST.keys():
-            print(key)
             if key.startswith('voltooi-'):
                 prod = key[8:]
-                mongo_manage.update_state_prod(prod, 'voltooid' )
+                mongo_manage.update_state_prod(prod, 'voltooid')
+                return render(request, 'zoekApp/producten.html', {"producten_form": producten_form, "products_list" : PROD})
             elif key.startswith('probleem-'):
                 prod = key[9:]
-                mongo_manage.update_state_prod(prod, 'probleem' )
+                mongo_manage.update_state_prod(prod, 'probleem')
+                return render(request, 'zoekApp/producten.html', {"producten_form": producten_form, "products_list" : PROD})
             elif key.startswith('behandeling-'):
                 prod = key[12:]
-                mongo_manage.update_state(prod, 'bezig' )
+                mongo_manage.update_state(prod, 'bezig')
+                return render(request, 'zoekApp/producten.html', {"producten_form": producten_form, "products_list" : PROD})
         if producten_form.is_valid():
             typ_prod = producten_form.cleaned_data["temp_prod_type"]
             prod = producten_form.cleaned_data["temp_product"]
             state = producten_form.cleaned_data["state"]
-            resultaten = mongo_manage.zoek_prod({'cat' : typ_prod, 'product' : prod, 'state' : state})
-            totaal = resultaten.count()
-            return render(request, 'zoekApp/producten_results.html', {"resultaten": resultaten, "totaal" : totaal}) 
+            resultaten = mongo_manage.zoek_prod({'cat': typ_prod, 'product': prod, 'state': state})
+            totaal = resultaten[0]
+            return render(request, 'zoekApp/producten_results.html', {"resultaten": resultaten[1], "totaal": totaal})
         else:
             messages.error(request, "Hier klopt iets niet, vul opnieuw in")
-        #return HttpResponse("zoekApp/bestellingen_results.html") 
+        # return HttpResponse("zoekApp/bestellingen_results.html")
     else:
         producten_form = forms.producten()
-    return render(request, 'zoekApp/producten.html', {"producten_form": producten_form})
+    return render(request, 'zoekApp/producten.html', {"producten_form": producten_form, "products_list" : PROD})
 
 
 def alles(request):
@@ -69,10 +75,11 @@ def alles(request):
             return redirect('/zoek/alles?dag=' + dag + "&state=" + state)
         else:
             messages.error(request, "Hier klopt iets niet, vul opnieuw in")
-        #return HttpResponse("zoekApp/bestellingen_results.html") 
+        # return HttpResponse("zoekApp/bestellingen_results.html")
     else:
         alles_form = forms.alles()
     return render(request, 'zoekApp/alles.html', {"alles_form": alles_form})
+
 
 def alles_result(request):
     if request.method == "POST":
@@ -80,16 +87,15 @@ def alles_result(request):
             print(key)
             if key.startswith('voltooi-'):
                 bestel_nmr = key[8:]
-                mongo_manage.update_state_best(int(bestel_nmr) , 'voltooid' )
+                mongo_manage.update_state_best(int(bestel_nmr), 'voltooid')
             elif key.startswith('probleem-'):
                 bestel_nmr = key[9:]
-                mongo_manage.update_state_best(int(bestel_nmr) , 'probleem' )
+                mongo_manage.update_state_best(int(bestel_nmr), 'probleem')
             elif key.startswith('behandeling-'):
                 bestel_nmr = key[12:]
-                mongo_manage.update_state_best(int(bestel_nmr) , 'bezig' )
+                mongo_manage.update_state_best(int(bestel_nmr), 'bezig')
     dag = request.GET['dag']
     state = request.GET['state']
-    resultaten = mongo_manage.zoek_best_alles(dag, state)
-    totaal = resultaten.count()
-    return render(request, 'zoekApp/alles_results.html', {"resultaten": resultaten, "totaal" : totaal}) 
-    
+    resultaten = mongo_manage.zoek_best_alles({'dagophalen': dag, 'state': state})
+    totaal = resultaten[0]
+    return render(request, 'zoekApp/alles_results.html', {"resultaten": resultaten[1], "totaal": totaal})

@@ -1,4 +1,5 @@
 from utils import get_db
+
 kerst_db = get_db('kerst_db')
 prods = kerst_db['producten']
 bests = kerst_db['bestellingen']
@@ -15,52 +16,57 @@ def verwijder_best():
     else:
         print("Het gaat helemaal mis, het is niet gelukt.")
 
+
 def zoek_prod(dict):
     new_dict = {}
     for key, value in dict.items():
-        if value != '' and value != None and value != "Alles":
+        if key == "product" and value != "":
+            del new_dict["cat"]
             new_dict[key] = value
-    print(new_dict)
-    return prods.find(new_dict)
+        elif value != '' and value is not None and value != "Alles":
+            new_dict[key] = value
+    return prods.count_documents(new_dict), prods.find(new_dict)
 
-def zoek_best_alles(dag, state):
-    if dag != '25' and state != "Alles":
-        resultaten = bests.find({'dagophalen' : dag, 'state' : state})
-    elif dag == '25' and state != "Alles":
-        resultaten = bests.find({"state" : state})
-    elif state == "Alles" and dag != '25':
-        resultaten = bests.find({"dagophalen" : dag})
-    else:
-        resultaten = bests.find({})
-    return resultaten
+
+def zoek_best_alles(dict):
+    new_dict = {}
+    for key, value in dict.items():
+        if value == '' or value is None:
+            continue
+        elif key == 'dagophalen':
+            new_dict['dagophalen'] = str(value)
+        else:
+            new_dict[key] = value
+    return bests.count_documents(new_dict), bests.find(new_dict)
+
 
 def update_state_best(num, state):
-    bests.update_one({'bestelnr' : num}, {'$set' : {'state' : state}}, upsert=False)
+    bests.update_one({'bestelnr': num}, {'$set': {'state': state}}, upsert=False)
+
 
 def update_state_prod(prod, state):
-    bests.update_one({'product' : prod}, {'$set' : {'state' : state}}, upsert=False)
+    prods.update_one({'product': prod}, {'$set': {'state': state}}, upsert=False)
+
 
 def zoek_best(dict):
     new_dict = {}
     for key, value in dict.items():
-        if value == '' or value == None:
+        if value == '' or value is None:
             continue
         elif key == 'bestelnr':
             new_dict['bestelnr'] = int(value)
-            print("ik kom!!")
         elif key == 'dagophalen':
             new_dict['dagophalen'] = str(value)
         else:
-            new_dict.update({key : value})
-    print(new_dict)
-    return bests.find(new_dict)
+            new_dict.update({key: value})
+    return bests.count_documents(new_dict), bests.find(new_dict)
 
 
 def cat_toevoegen():
     obj_geen_cat = []
     for obj in prods.find({'cat': {'$exists': False}}):
         obj_geen_cat.append(obj)
-    
+
     while True:
         try:
             obj = obj_geen_cat[0]
@@ -72,12 +78,12 @@ def cat_toevoegen():
 
         cat = input('\nDe categorie van ' + product + " - ")
         update_result = prods.update_one({'product': product}, {'$set': {'cat': cat}})
-        
+
         if update_result.acknowledged and update_result.modified_count == 1:
             print('Gelukt, de categorie van ' + product + " is nu " + cat + "!")
         else:
             print("Er is iets fout gegaan.")
-        
+
         obj_geen_cat.remove(obj)
 
         door = input('Wil je nog een categorie toevoegen (y/n) - ')
