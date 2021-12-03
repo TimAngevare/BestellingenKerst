@@ -10,7 +10,7 @@ from .forms import *
 
 from utils import get_db
 
-kerst_db = get_db('kerst_db')
+kerst_db = get_db('dev_kerst_db')
 bests = kerst_db['bestellingen']
 prods = kerst_db['producten']
 

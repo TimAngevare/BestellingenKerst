@@ -1,6 +1,6 @@
 from utils import get_db
 
-kerst_db = get_db('kerst_db')
+kerst_db = get_db('dev_kerst_db')
 prods = kerst_db['producten']
 bests = kerst_db['bestellingen']
 
