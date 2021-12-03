@@ -1,6 +1,7 @@
 {% extends 'main.html' %}
 
 {% block content %}
+    <meta http-equiv="refresh" content="120">
 <div class="w3-container">
         <h2>Totaal bestellingen</h2>
         <h3>{{ totaal }}</h3>
@@ -13,7 +14,7 @@
             {% for key, value in product.items %}
                 {% if key == "bestelnr"%}
                     <div class="w3-container w3-center">
-                        <form method="post" action="{% url 'zoekApp:producten' %}">
+                        <form method="post" action="">
                             {% csrf_token %}
                             <button name= "voltooi-{{value}}" class="w3-button w3-green w3-margin w3-round-large" type="submit">Voltooi</button>
                             <button name= "probleem-{{value}}" class="w3-button w3-red w3-margin w3-round-large">Probleem</button>
