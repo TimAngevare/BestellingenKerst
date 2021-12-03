@@ -10,18 +10,18 @@
     <div class="w3-container">
         <h2>Bestellingen</h2>
         {% for product in resultaten %}
-        <div class="w3-container w3-teal w3-margin w3-card-4">
+        <div class="w3-container w3-margin w3-card-4">
             {% for key, value in product.items %}
                 {% if key == "bestelnr"%}
-                    <div class="w3-container w3-center">
+                    <div class="w3-container w3-blue-gray w3-center w3-margin">
                         <form method="post" action="">
                             {% csrf_token %}
                             <button name= "voltooi-{{value}}" class="w3-button w3-green w3-margin w3-round-large" type="submit">Voltooi</button>
                             <button name= "probleem-{{value}}" class="w3-button w3-red w3-margin w3-round-large">Probleem</button>
                             <button name= "behanldeling-{{value}}" class="w3-button w3-orange w3-margin w3-round-large">Neem in behandeling</button>
                         </form>
+                        <h3><b>{{key}} : {{value}}</b></h3>
                     </div>
-                    <p><b>{{key}} : {{value}}</b></p>\
                 {% elif key == "state"%}
                     {% if value == "niet_gestart"%}
                         <div class="w3-container w3-blue-gray w3-margin w3-center">
@@ -43,7 +43,7 @@
                                 <ul class="w3-ul w3-border">
                                 {% if property == "product"%}
                                     <li><h4><b>{{detail}}</b></h4></li>
-                                {% else%}
+                                {% elif property != "state" %}
                                     <li>{{property}} : {{detail}}</li>
                                 {% endif %}
                                 </ul>
@@ -51,7 +51,9 @@
                         </div>
                     {% endfor %}
                 {% elif key != "_id" %}
-                    <p>{{ key }} : {{ value }}</p>
+                    <div>
+                        <p>{{ key }} : {{ value }}</p>
+                    </div>
                 {% endif %}
             {% endfor %}
         </div>
