@@ -76,7 +76,7 @@ def alles(request):
         if alles_form.is_valid():
             dag = alles_form.cleaned_data["dag"]
             state = alles_form.cleaned_data["state"]
-            return redirect('/zoek/alles?dag=' + dag + "&state=" + state)
+            return redirect('/zoek/alles?dag=' + dag + "&state=" + state + "&nmr=")
         else:
             messages.error(request, "Hier klopt iets niet, vul opnieuw in")
         # return HttpResponse("zoekApp/bestellingen_results.html")
@@ -88,9 +88,9 @@ def alles(request):
 def alles_result(request):
     dag = request.GET['dag']
     state = request.GET['state']
+    nmr = request.GET['nmr']
     if request.method == "POST":
         for key in request.POST.keys():
-            print(key)
             if key.startswith('voltooi-'):
                 bestel_nmr = key[8:]
                 mongo_manage.update_state_best(int(bestel_nmr), 'voltooid')
@@ -99,7 +99,9 @@ def alles_result(request):
                 mongo_manage.update_state_best(int(bestel_nmr), 'probleem')
             elif key.startswith('behandeling-'):
                 bestel_nmr = key[12:]
+                print("hola " + bestel_nmr)
                 mongo_manage.update_state_best(int(bestel_nmr), 'bezig')
+                return redirect('/zoek/alles?dag=&state=bezig&nmr=' + bestel_nmr)
     resultaten = mongo_manage.zoek_best_alles({'dagophalen': dag, 'state': state})
     totaal = resultaten[0]
     return render(request, 'zoekApp/alles_results.html', {"resultaten": resultaten[1], "totaal": totaal})

@@ -2,9 +2,11 @@
 
 {% block content %}
     <meta http-equiv="refresh" content="120">
-<div class="w3-container">
-        <h2>Totaal bestellingen</h2>
-        <h3>{{ totaal }}</h3>
+    <div class="w3-container">
+        <a href="{% url 'zoekApp:alles' %}"><img style="width: 3%; height: auto; text-align: right;" src="https://img.icons8.com/ios-filled/50/000000/circled-left-2.png"/></a>
+    </div>
+    <div class="w3-container w3-center">
+        <h2>Totaal bestellingen: {{ totaal }}</h2>
     </div>
     <hr>
     <div class="w3-container">
@@ -18,7 +20,7 @@
                             {% csrf_token %}
                             <button name= "voltooi-{{value}}" class="w3-button w3-green w3-margin w3-round-large" type="submit">Voltooi</button>
                             <button name= "probleem-{{value}}" class="w3-button w3-red w3-margin w3-round-large">Probleem</button>
-                            <button name= "behanldeling-{{value}}" class="w3-button w3-orange w3-margin w3-round-large">Neem in behandeling</button>
+                            <button name= "behandeling-{{value}}" class="w3-button w3-orange w3-margin w3-round-large">Neem in behandeling</button>
                         </form>
                         <h3><b>{{key}} : {{value}}</b></h3>
                     </div>
@@ -33,6 +35,10 @@
                         </div>
                     {% elif value == "probleem"%}
                         <div class="w3-container w3-red w3-center w3-margin">
+                            <p>Staat : {{value}}</p>
+                        </div>
+                    {% elif value == "bezig"%}
+                        <div class="w3-container w3-orange w3-center w3-margin">
                             <p>Staat : {{value}}</p>
                         </div>
                     {% endif %}
