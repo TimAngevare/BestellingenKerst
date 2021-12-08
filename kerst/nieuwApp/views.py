@@ -8,19 +8,20 @@ import datetime
 from .models import *
 from .forms import *
 
-from utils import get_db
-
-kerst_db = get_db('dev_kerst_db')
+from mongo_manage import kerst_db
 bests = kerst_db['bestellingen']
 prods = kerst_db['producten']
 
 alle_prodlist = []
 standaard_prodlist = []
 snijdvlees_prodlist = []
+cat_list = []
 
 obj_prods = prods.find({}, {'product': 1, 'snijdvlees': 1, 'cat': 1})
 for obj_prod in obj_prods:
     alle_prodlist.append(obj_prod['product'])
+    if obj_prod['cat'] not in cat_list:
+        cat_list.append(obj_prod['product'])
 
     if obj_prod['cat'] in ['dry_aged', 'menu', 'zelf_gourmet', 'rollade']:
         continue
@@ -223,15 +224,19 @@ def prod_toevoegen(request):
         elif form.is_valid():
             data = form.cleaned_data
             nieuw_prod = data['product'].strip().lower()
-            Product(nieuw_prod, data['cat'], data['snijdvlees']).insert()
+            cat = data['cat'].strip().lower()
+            Product(nieuw_prod, cat, data['snijdvlees']).insert()
+
+            if cat not in cat_list:
+                cat_list.append(cat)
 
             alle_prodlist.append(nieuw_prod)
             if data['snijdvlees']:
                 snijdvlees_prodlist.append(nieuw_prod)
-            else:
+            elif data['cat'] not in ['dry_aged', 'menu', 'zelf_gourmet', 'rollade']:
                 standaard_prodlist.append(nieuw_prod)
 
-            messages.success(request, f"Product '{nieuw_prod}' is aangemaakt!", extra_tags='w3-green')
+            messages.success(request, f"Product '{nieuw_prod}' ({cat}) is aangemaakt!", extra_tags='w3-green')
             return render(request, 'nieuwApp/gekozenNieuw.html', {
                 'gekozen_type': oude_type,
                 'passed_bestelnr': bestelnr,
@@ -248,7 +253,8 @@ def prod_toevoegen(request):
                 'gekozen_type': oude_type,
                 'passed_bestelnr': bestelnr,
                 'passed_email': email,
-                'form': form
+                'form': form,
+                'cat_list': cat_list
             })
     else:
         return HttpResponse("Gast dit kan niet jonge")
@@ -331,7 +337,8 @@ def speciale_optie(request):
                 'gekozen_type': oude_type,
                 'passed_bestelnr': bestelnr,
                 'passed_email': email,
-                'form': ProductForm()
+                'form': ProductForm(),
+                'cat_list': cat_list
             })
 
         elif request.POST['done'] == 'Nieuw product':
@@ -339,7 +346,8 @@ def speciale_optie(request):
                 'gekozen_type': oude_type,
                 'passed_bestelnr': bestelnr,
                 'passed_email': email,
-                'form': ProductForm()
+                'form': ProductForm(),
+                'cat_list': cat_list
             })
 
         elif request.POST['done'] == 'Ander type product':
@@ -392,7 +400,8 @@ def nieuw_keuze(request):
                 'gekozen_type': oude_type,
                 'passed_bestelnr': bestelnr,
                 'passed_email': email,
-                'form': ProductForm()
+                'form': ProductForm(),
+                'cat_list': cat_list
             })
 
         if oude_type == 'snijdvlees':

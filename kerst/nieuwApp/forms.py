@@ -132,7 +132,11 @@ class BestellingAfmakenForm(forms.Form):
 class ProductForm(forms.Form):
     product = temp_product
     cat = forms.CharField(label="Categorie", max_length=100, widget=forms.TextInput(
-        attrs={'class': 'w3-input w3-border w3-light-grey'}))
+        attrs={'class': 'w3-input w3-border w3-light-grey',
+               'list': 'cats',
+               'spellcheck': 'false'
+               }))
+
     snijdvlees = forms.BooleanField(label="Snijdbaar vlees", required=False, widget=forms.CheckboxInput(
         attrs={'class': 'w3-check'}
     ))

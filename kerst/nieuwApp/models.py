@@ -1,8 +1,6 @@
 # from django.db import models
 
-from utils import get_db
-
-kerst_db = get_db('dev_kerst_db')
+from mongo_manage import kerst_db
 bests = kerst_db['bestellingen']
 prods = kerst_db['producten']
 
