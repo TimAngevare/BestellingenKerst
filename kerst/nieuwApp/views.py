@@ -342,7 +342,7 @@ def speciale_optie(request):
                 'form': ProductForm()
             })
 
-        elif request.POST['done'] == 'Ander type product':
+        elif request.POST['done'] == 'Nog een product':
             nieuw_type = request.POST['prod_type']
             return render(request, 'nieuwApp/gekozenNieuw.html', {
                 'gekozen_type': nieuw_type,
