@@ -80,6 +80,7 @@ class Menu:
         for key, value in self.voorgerecht.items():
             nieuw_key = 'voorgerecht.' + key
             incs[nieuw_key] = value
+            incs['menu_detail.' + key + '.' + str(bestelnr)] = value
 
         incs['hoofdgerecht.beef_wellington'] = self.aantal
         incs['menu_detail.beef_wellington.' + str(bestelnr)] = self.aantal

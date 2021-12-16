@@ -129,6 +129,10 @@ class BestellingAfmakenForm(forms.Form):
                                   widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
 
 
+class VerwijderForm(forms.Form):
+    bestelnr = forms.IntegerField(label="Bestelnummer")
+
+
 class ProductForm(forms.Form):
     product = temp_product
     cat = forms.CharField(label="Categorie", max_length=100, widget=forms.TextInput(
