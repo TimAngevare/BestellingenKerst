@@ -463,10 +463,10 @@ def nieuw_keuze(request):
             if form.is_valid():
                 data = form.cleaned_data
                 conf_doc = {}
-                menu_items = ['bavette', 'kogel_biefstuk', 'ossenhaaspuntjes', 'ba_hamburgers', 'rundervink',
-                              'speklapjes', 'varkenshaassate', 'shoarma', 'varkenshaas', 'kip_bacon_chili', 'slavink',
-                              'kipfilet', 'hamburger', 'lamsrack', 'dry_aged', 'kalfsoester', 'diamanthaas',
-                              'ba_cheddar', 'chipolata', 'chinese_roaststeak']
+                menu_items = ['ba_cheddar', 'ba_hamburgers', 'bavette', 'chinese_roaststeak', 'chipolata',
+                              'diamanthaas', 'dry_aged', 'hamburger', 'kalfsoester', 'kip_bacon_chili', 'kipfilet',
+                              'kogel_biefstuk', 'lamsrack', 'ossenhaaspuntjes', 'rundervink', 'shoarma', 'slavink',
+                              'speklapjes', 'varkenshaas', 'varkenshaassate']
 
                 for optie in menu_items:
                     int_optie = int(data[optie])
