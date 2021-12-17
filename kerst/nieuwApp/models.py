@@ -148,6 +148,7 @@ class DryAgedVlees:
             'product': self.product,
             'soort': self.soort,
             'gewicht': self.gewicht,
+            # 'snijden': self.snijden
         }
 
         incs = {self.soort: int(self.gewicht), self.soort + '_detail.' + str(bestelnr): int(self.gewicht)}

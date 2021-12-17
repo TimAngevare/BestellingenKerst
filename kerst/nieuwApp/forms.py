@@ -243,8 +243,9 @@ class DryAgedForm(forms.Form):
     product = forms.ChoiceField(label="Product", choices=DRYAGED_OPTION,
                                 widget=forms.Select(attrs={'class': 'w3-select'}))
     soort = forms.ChoiceField(label="Soort", choices=SOORT_OPTION, widget=forms.Select(attrs={'class': 'w3-select'}))
-    # cat = "dry_aged"
     gewicht = temp_gewicht
+    # snijden = forms.CharField(label="Snijden", max_length=100, validators=[snijd_validator],
+    #                           widget=forms.TextInput(attrs={'class': 'w3-input w3-border w3-light-grey'}))
 
     bijz = temp_bijz
     prod_type = temp_prod_type

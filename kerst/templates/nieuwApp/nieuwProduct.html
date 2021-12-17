@@ -2,29 +2,41 @@
 
 {% block content %}
 
-<div class="w3-card w3-container">
-        <header class="w3-container w3-blue-grey">
-            <h3>Nieuw product toevoegen {% if nieuw_prod %}({{nieuw_prod}}){% endif %}</h3>
-        </header>
-        <form autocomplete="off" spellcheck="false" action="{% url 'nieuwApp:producttoevoegen' %}" method="post" class="w3-container w3-margin">
-            {% csrf_token %}
-            <input type="hidden" name="huidig_type" id="huidig_type" value="{{ gekozen_type }}">
-            <input type="hidden" name="bestelnr" id="bestelnr" value="{{ passed_bestelnr }}">
-            <input type="hidden" name="usr_email" id="usr_email" value="{{ passed_email }}">
+<div class="w3-card w3-container w3-margin">
+    <header class="w3-container w3-blue-grey">
+        <h3>Nieuw product toevoegen {% if nieuw_prod %}({{nieuw_prod}}){% endif %}</h3>
+    </header>
+    <form autocomplete="off" spellcheck="false" action="{% url 'nieuwApp:producttoevoegen' %}" method="post" class="w3-container w3-margin">
+        {% csrf_token %}
+        <input type="hidden" name="huidig_type" id="huidig_type" value="{{ gekozen_type }}">
+        <input type="hidden" name="bestelnr" id="bestelnr" value="{{ passed_bestelnr }}">
+        <input type="hidden" name="usr_email" id="usr_email" value="{{ passed_email }}">
 
-            {{form}}
+        {{form}}
 
-            <datalist id="cats">
-                {% for cat in cat_list %}
-                    <option value="{{cat}}">
-                {% endfor %}
-            </datalist>
+        <datalist id="cats">
+            {% for cat in cat_list %}
+                <option value="{{cat}}">
+            {% endfor %}
+        </datalist>
 
-            <div class="w3-bar w3-container w3-margin">
-                <input class="w3-btn w3-round-large w3-red" style="width: 35%;" type="submit" name="done" value="Annuleren">
-                <input class="w3-btn w3-round-large w3-blue" style="width: 25%;" type="submit" name="done" value="Product toevoegen">
-            </div>
-        </form>
+        <div class="w3-bar w3-container w3-margin">
+            <input class="w3-btn w3-round-large w3-red" style="width: 35%;" type="submit" name="done" value="Annuleren">
+            <input class="w3-btn w3-round-large w3-blue" style="width: 25%;" type="submit" name="done" value="Product toevoegen">
+        </div>
+    </form>
+</div>
+
+<div class="w3-card w3-container w3-margin" style="width: 50%;">
+    <header class="w3-container w3-indigo">
+        <h3>Aandachtspunten bij een nieuw product</h3>
+    </header>
+    <div class="w3-container">
+        <ul class="w3-ul">
+            <li>Categorie heeft <strong>geen</strong> invloed op waar het product is te vinden via het product keuzemenu.
+                Dit wordt bepaald door wel/geen vinkje bij <i>snijdvlees</i>.</li>
+        </ul>
     </div>
+</div>
 
 {% endblock content %}
