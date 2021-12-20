@@ -15,13 +15,13 @@ prods = kerst_db['producten']
 alle_prodlist = []
 standaard_prodlist = []
 snijdvlees_prodlist = []
-cat_list = []
+cat_list = ["overig"]
 
 obj_prods = prods.find({}, {'product': 1, 'snijdvlees': 1, 'cat': 1})
 for obj_prod in obj_prods:
     alle_prodlist.append(obj_prod['product'])
     if obj_prod['cat'] not in cat_list:
-        cat_list.append(obj_prod['product'])
+        cat_list.append(obj_prod['cat'])
 
     if obj_prod['cat'] in ['dry_aged', 'menu', 'zelf_gourmet', 'rollade']:
         continue
@@ -34,7 +34,8 @@ for obj_prod in obj_prods:
 
 def index(request):
     return render(request, 'main.html', {
-        "mainpage": True
+        "mainpage": True,
+        "verwijder_form": VerwijderForm
     })
 
 
@@ -263,60 +264,80 @@ def prod_toevoegen(request):
 def speciale_optie(request):
     if request.method == 'POST':
         bestelnr = int(request.POST['bestelnr'])
-        email = request.POST['usr_email']
 
-        try:
-            oude_type = request.POST['huidig_type']
-        except KeyError:
-            oude_type = request.POST['prod_type']
-
+        # Bestelling verwijderen, kan vanaf meerdere paginas komen
         if request.POST['done'] == 'Verwijder bestelling':
-            producten_array = (bests.find_one({'bestelnr': bestelnr}, {'producten': 1}))['producten']
+            find_result = bests.find_one({'bestelnr': bestelnr}, {'producten': 1})
 
+            if not find_result:
+                messages.error(request, f'Bestelling #{str(bestelnr)} bestaat niet, dus is niet verwijderd.', extra_tags='w3-red')
+                return HttpResponseRedirect('/')
+
+            producten_array = find_result['producten']
+
+            # Eerst alle producten verwijderen
             for product in producten_array:
                 prod_naam = product['product']
                 inc_doc = {}
 
-                try:
-                    snijden = product['snijden']
-                    inc_doc['gewicht'] = int(product['gewicht']) * -1
-                    for gewicht, aantal in snijden.items():
-                        inc_doc['snijden.' + gewicht] = int(aantal) * -1
-                        inc_doc['snijden_detail.' + gewicht + '.' + bestelnr] = int(aantal) * -1
+                cat = prods.find_one({'product': prod_naam})['cat']
 
-                except KeyError:
-                    cat_doc = prods.find_one({'product': prod_naam})
-                    cat = cat_doc['cat']
-                    if cat == 'zelf_gourmet':
-                        for prod, doc in product['conf'].items():
-                            ding = next(iter(doc))
-                            inc_doc['conf.' + prod + '.' + ding] = int(doc[ding]) * -1
+                if cat == 'zelf_gourmet':
+                    for prod, doc in product['conf'].items():
+                        ding = next(iter(doc))
+                        inc_doc['conf.' + prod + '.' + ding] = int(doc[ding]) * -1
+                        inc_doc['conf_detail.' + prod + '.' + ding + '.' + str(bestelnr)] = int(doc[ding]) * -1
 
-                    elif cat == 'dry_aged':
-                        inc_doc[product['soort']] = int(product['gewicht']) * -1
+                elif cat == 'dry_aged':
+                    inc_doc[product['soort']] = int(product['gewicht']) * -1
 
-                    elif cat == 'menu':
-                        aantal = int(product['aantal'])
-                        inc_doc['aantal'] = aantal * -1
+                    # Huidige implementatie
+                    inc_doc[product['soort'] + '_detail.' + str(bestelnr)] = int(product['gewicht']) * -1
 
-                        for gerecht, nummer in product['voorgerecht'].items():
-                            inc_doc['voorgerecht.' + gerecht] = int(nummer) * -1
+                    # Implementatie voor snijden bij dry_aged
+                    # snijden = product['snijden']
+                    # for gewicht, aantal in snijden.items():
+                    #     inc_doc['snijden.' + gewicht] = int(aantal) * -1
+                    #     inc_doc[product['soort'] + '_detail.' + gewicht + '.' + str(bestelnr)] = int(aantal) * -1
 
-                        inc_doc['hoofdgerecht.beef_wellington'] = aantal * -1
-                        inc_doc['dessert.dessert_buffet'] = aantal * -1
+                elif cat == 'menu':
+                    aantal = int(product['aantal'])
+                    inc_doc['aantal'] = aantal * -1
 
-                    elif cat == 'rollade':
-                        int_gewicht = int(product['gewicht'])
-                        inc_doc['gewicht'] = int_gewicht * -1
+                    for gerecht, nummer in product['voorgerecht'].items():
+                        inc_doc['voorgerecht.' + gerecht] = int(nummer) * -1
+                        inc_doc['menu_detail.' + gerecht + '.' + str(bestelnr)] = int(nummer) * -1
 
-                        if product['gekruid']:
-                            inc_doc['gekruid.ja'] = int_gewicht * -1
-                        else:
-                            inc_doc['gekruid.nee'] = int_gewicht * -1
+                    inc_doc['hoofdgerecht.beef_wellington'] = aantal * -1
+                    inc_doc['menu_detail.beef_wellington.' + str(bestelnr)] = aantal * -1
 
+                    inc_doc['dessert.dessert_buffet'] = aantal * -1
+                    inc_doc['menu_detail.dessert_buffet.' + str(bestelnr)] = aantal * -1
+
+                elif cat == 'rollade':
+                    int_gewicht_neg = int(product['gewicht']) * -1
+                    inc_doc['gewicht'] = int_gewicht_neg
+
+                    if product['gekruid']:
+                        inc_doc['gekruid.ja'] = int_gewicht_neg
+                        inc_doc['gekruid_detail.ja.' + str(bestelnr)] = int_gewicht_neg
                     else:
-                        inc_doc['aantal'] = int(product['aantal']) * -1
+                        inc_doc['gekruid.nee'] = int_gewicht_neg
+                        inc_doc['gekruid_detail.nee.' + str(bestelnr)] = int_gewicht_neg
 
+                else:
+                    try:
+                        snijden = product['snijden']
+                        inc_doc['gewicht'] = int(product['gewicht']) * -1
+                        for gewicht, aantal in snijden.items():
+                            inc_doc['snijden.' + gewicht] = int(aantal) * -1
+                            inc_doc['snijden_detail.' + gewicht + '.' + str(bestelnr)] = int(aantal) * -1
+
+                    except KeyError:
+                        inc_doc['aantal'] = int(product['aantal']) * -1
+                        inc_doc['detail.' + str(bestelnr)] = int(product['aantal']) * -1
+
+                # In 1 keer checken of dat er een bijzonderheid is
                 try:
                     bijz = product['bijz']
 
@@ -327,11 +348,20 @@ def speciale_optie(request):
                 except KeyError:
                     prods.update_one({'product': prod_naam}, {'$inc': inc_doc})
 
+            # Nog even de bestelling zelf verwijderen en dan klaar!
             bests.delete_one({'bestelnr': bestelnr})
-            messages.success(request, f'Bestelling #{bestelnr} is verwijderd!', extra_tags='w3-green')
+            messages.success(request, f'Bestelling #{str(bestelnr)} is verwijderd!', extra_tags='w3-green')
             return HttpResponseRedirect('/')
 
-        elif request.POST['done'] == 'Nieuw product toevoegen':
+        # Vanaf hier komt het altijd met de context van email en het type
+        email = request.POST['usr_email']
+
+        try:
+            oude_type = request.POST['huidig_type']
+        except KeyError:
+            oude_type = request.POST['prod_type']
+
+        if request.POST['done'] == 'Nieuw product toevoegen':
             return render(request, 'nieuwApp/nieuwProduct.html', {
                 'nieuw_prod': request.POST['product'],
                 'gekozen_type': oude_type,
@@ -463,10 +493,10 @@ def nieuw_keuze(request):
             if form.is_valid():
                 data = form.cleaned_data
                 conf_doc = {}
-                menu_items = ['bavette', 'kogel_biefstuk', 'ossenhaaspuntjes', 'ba_hamburgers', 'rundervink',
-                              'speklapjes', 'varkenshaassate', 'shoarma', 'varkenshaas', 'kip_bacon_chili', 'slavink',
-                              'kipfilet', 'hamburger', 'lamsrack', 'dry_aged', 'kalfsoester', 'diamanthaas',
-                              'ba_cheddar', 'chipolata', 'chinese_roaststeak']
+                menu_items = ['ba_cheddar', 'ba_hamburgers', 'bavette', 'chinese_roaststeak', 'chipolata',
+                              'diamanthaas', 'dry_aged', 'hamburger', 'kalfsoester', 'kip_bacon_chili', 'kipfilet',
+                              'kogel_biefstuk', 'lamsrack', 'ossenhaaspuntjes', 'rundervink', 'shoarma', 'slavink',
+                              'speklapjes', 'varkenshaas', 'varkenshaassate']
 
                 for optie in menu_items:
                     int_optie = int(data[optie])
@@ -495,6 +525,16 @@ def nieuw_keuze(request):
             form = DryAgedForm(request.POST)
             if form.is_valid():
                 data = form.cleaned_data
+                # snijd_string = data['snijden']
+                # snijd_komma_splits = snijd_string.split(',')
+                # del snijd_komma_splits[-1]
+                #
+                # snijd_obj = {}
+                #
+                # for snijdoptie in snijd_komma_splits:
+                #     snijdvalue = snijdoptie.split(':')
+                #     snijd_obj[snijdvalue[0]] = int(snijdvalue[1])
+
                 DryAgedVlees(data['product'], data['soort'], data['gewicht'], data['bijz']).insert(bestelnr)
             else:
                 messages.error(request, 'Oeps, er is iets mis. Probeer het aub opnieuw', extra_tags='w3-red')

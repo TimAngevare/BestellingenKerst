@@ -49,8 +49,16 @@
                                 <ul class="w3-ul w3-border">
                                 {% if property == "product"%}
                                     <li><h4><b>{{detail}}</b></h4></li>
+                                {% elif property == "conf" %}
+                                    {% for ingredi, aantal in detail.items %}
+                                        <li><b>{{ ingredi }}</b>
+                                        {% for gem, hoeveelheid in aantal.items %}
+                                            {{ gem }} : {{ hoeveelheid }}
+                                        {% endfor %}
+                                        </li>
+                                    {% endfor %}
                                 {% elif property != "state" %}
-                                    <li>{{property}} : {{detail}}</li>
+                                    <li><b>{{property}}</b> : {{detail}}</li>
                                 {% endif %}
                                 </ul>
                             {% endfor %}

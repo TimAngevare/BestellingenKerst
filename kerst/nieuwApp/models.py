@@ -6,13 +6,13 @@ prods = kerst_db['producten']
 
 
 class Product:
-    def __init__(self, product, cat, snijdbaar):
+    def __init__(self, product, cat, snijdvlees):
         self.product = product
         self.cat = cat
-        self.snijdbaar = snijdbaar
+        self.snijdvlees = snijdvlees
 
     def insert(self):
-        prods.insert_one({"product": self.product, "cat": self.cat, "snijdvlees": self.snijdbaar, "state" : "niet_gestart"})
+        prods.insert_one({"product": self.product, "cat": self.cat, "snijdvlees": self.snijdvlees, "state": "niet_gestart"})
 
 
 class Snijdvlees:
@@ -80,9 +80,13 @@ class Menu:
         for key, value in self.voorgerecht.items():
             nieuw_key = 'voorgerecht.' + key
             incs[nieuw_key] = value
+            incs['menu_detail.' + key + '.' + str(bestelnr)] = value
 
         incs['hoofdgerecht.beef_wellington'] = self.aantal
+        incs['menu_detail.beef_wellington.' + str(bestelnr)] = self.aantal
+
         incs['dessert.dessert_buffet'] = self.aantal
+        incs['menu_detail.dessert_buffet.' + str(bestelnr)] = self.aantal
 
         if self.bijz:
             prods.update_one({'product': self.product},
@@ -111,9 +115,10 @@ class Gourmet:
 
         incs = {}
 
-        for key, value in self.conf.items():
-            ding = next(iter(value))
-            incs['conf.' + key + '.' + ding] = value[ding]
+        for prod_naam, gemar in self.conf.items():
+            ding = next(iter(gemar))
+            incs['conf.' + prod_naam + '.' + ding] = gemar[ding]
+            incs['conf_detail.' + prod_naam + '.' + ding + '.' + str(bestelnr)] = gemar[ding]
 
         if self.bijz:
             new_doc['bijz'] = self.bijz
@@ -143,9 +148,10 @@ class DryAgedVlees:
             'product': self.product,
             'soort': self.soort,
             'gewicht': self.gewicht,
+            # 'snijden': self.snijden
         }
 
-        incs = {self.soort: int(self.gewicht)}
+        incs = {self.soort: int(self.gewicht), self.soort + '_detail.' + str(bestelnr): int(self.gewicht)}
 
         if self.bijz:
             new_doc['bijz'] = self.bijz
@@ -175,7 +181,7 @@ class Standaard:
             'state': 'niet_gestart'
         }
 
-        incs = {'aantal': self.aantal}
+        incs = {'aantal': self.aantal, 'detail.' + str(bestelnr): self.aantal}
 
         if self.bijz:
             new_doc['bijz'] = self.bijz
@@ -206,8 +212,10 @@ class Rollade:
 
         if self.gekruid:
             incs['gekruid.ja'] = self.gewicht
+            incs['gekruid_detail.ja.' + str(bestelnr)] = self.gewicht
         else:
             incs['gekruid.nee'] = self.gewicht
+            incs['gekruid_detail.nee.' + str(bestelnr)] = self.gewicht
 
         if self.bijz:
             new_doc['bijz'] = self.bijz

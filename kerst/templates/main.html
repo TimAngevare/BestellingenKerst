@@ -25,7 +25,16 @@
         <header class="w3-display-container w3-gray" style="height: 120px; display: block;">
             <div class="w3-display-left"><a href="/"><img src="https://midmid.blob.core.windows.net/images/de-ambachtelijke-dorpsslagerij/logo/de-ambachtelijke-dorpsslagerij_16a495_md.jpg?v=d96a1867dd9b649db01551f10b456227" alt="Dorpsslagerij logo"></a></div>
             <div class="w3-display-middle"><h1>Kerstbestellingen 2021</h1></div>
-            {% comment %} {% if mainpage %}<div class="w3-display-right w3-margin"><a href="/slagersadmin">admin</a></div>{% endif %} {% endcomment %}        
+            {% if mainpage %}
+                <div class="w3-display-right w3-margin">
+                <form autocomplete="off" action="{% url 'nieuwApp:specialeoptie' %}" method="post">
+                    {% csrf_token %}
+                    {{ verwijder_form }}
+                    <input class="w3-btn w3-round-large w3-red w3-margin-left" type="submit" name="done" value="Verwijder bestelling">
+                </form>
+                </div>
+
+            {% endif %}
         </header>
         {% if messages %}
         <div class="w3-container w3-margin-top">
@@ -50,3 +59,6 @@
         {% endblock %}
     </body>
 </html>
+
+{% block extra %}
+{% endblock %}
