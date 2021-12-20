@@ -9,8 +9,9 @@
 </div>
 <hr>
 <div class="w3-container">
-    <h2>Bestellingen</h2>
+    <h2>Producten</h2>
     {% for product in resultaten %}
+        {% with counter=forloop.counter %}
         <div class="w3-center w3-container w3-card-4 w3-margin">
             {% for key, value in product.items %}
                 <div class="w3-container">
@@ -34,12 +35,67 @@
                                 </li>
                             {% endfor %}
                             </ul>
+                        {% elif key == "bijz" %}
+                            <script type="text/javascript">
+                                function bijztoggle{{ counter }}() {
+                                    var x = document.getElementById("bijz{{ counter }}");
+                                    if (x.style.display === "none") {
+                                        x.style.display = "block";
+                                    } else {
+                                        x.style.display = "none";
+                                    }
+                                }
+                            </script>
+                            <button onclick="bijztoggle{{ counter }}()" class="w3-button w3-margin w3-container w3-round-large w3-border w3-border-blue-gray">Toggle bijzonderheden<img src="https://img.icons8.com/material-sharp/24/000000/expand-arrow--v2.png" style="width: 24px; height: auto;"/></button>
+                            <div id="bijz{{ counter }}" style="display: none;" class="w3-container">
+                                <table class="w3-table-all w3-card-4 w3-margin">
+                                <tr>
+                                    <th>Bestel Nummer</th>
+                                    <th>Opmerking</th>
+                                </tr>
+                                {% for bestelling in value %}
+                                    {% for bestelnmr, opmerking in bestelling.items %}
+                                        <tr>
+                                            <td>{{ bestelnmr }}</td>
+                                            <td>{{ opmerking }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endfor %}
+                                </table>
+                            </div>
+                        {% elif key == "detail" %}
+                            <script type="text/javascript">
+                                function detailtoggle{{ counter }}() {
+                                    var x = document.getElementById("detail{{ counter }}");
+                                    if (x.style.display === "none") {
+                                        x.style.display = "block";
+                                    } else {
+                                        x.style.display = "none";
+                                    }
+                                }
+                            </script>
+                            <button onclick="detailtoggle{{ counter }}()" class="w3-button w3-margin w3-container w3-round-large w3-border w3-border-blue-gray">Toggle detail <img src="https://img.icons8.com/material-sharp/24/000000/expand-arrow--v2.png" style="width: 24px; height: auto;"/></button>
+                            <div id="detail{{ counter }}" style="display: none;" class="w3-container">
+                                <table class="w3-table-all w3-card-4 w3-margin">
+                                <tr>
+                                    <th>Bestel Nummer</th>
+                                    <th>Aantal</th>
+                                </tr>
+                                    {% for bestelnmr, opmerking in value.items %}
+                                        <tr>
+                                            <td>{{ bestelnmr }}</td>
+                                            <td>{{ opmerking }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
                         {% elif key != "_id"%}
                             <p><b>{{ key }}</b> : {{ value }}</p>
                         {% endif %}
                 </div>
             {% endfor %}
         </div>
+        {% endwith %}
     {% endfor %}
 </div>
 
