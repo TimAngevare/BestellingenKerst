@@ -16,6 +16,19 @@ def zoek(request):
 def bestellingen(request):
     if request.method == "POST":
         bestel_form = forms.bestellingen(request.POST)
+        for key in request.POST.keys():
+            if key.startswith('voltooi-'):
+                prod = key[8:]
+                mongo_manage.update_state_best(prod, 'voltooid')
+                return render(request, 'zoekApp/bestellingen.html', {"bestel_form": bestel_form})
+            elif key.startswith('probleem-'):
+                prod = key[9:]
+                mongo_manage.update_state_best(prod, 'probleem')
+                return render(request, 'zoekApp/bestellingen.html', {"bestel_form": bestel_form})
+            elif key.startswith('behandeling-'):
+                prod = key[12:]
+                mongo_manage.update_state_best(prod, 'bezig')
+                return render(request, 'zoekApp/bestellingen.html', {"bestel_form": bestel_form})
         if bestel_form.is_valid():
             num = bestel_form.cleaned_data["bestel_nmr"]
             tel = bestel_form.cleaned_data["tel"]

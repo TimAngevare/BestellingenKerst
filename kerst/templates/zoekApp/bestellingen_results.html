@@ -15,7 +15,13 @@
             {% for key, value in product.items %}
                 {% if key == "bestelnr" %}
                     <div class="w3-container w3-blue-gray w3-center w3-margin">
-                        <h3><b>{{ value }}</b></h3>
+                        <form method="post" action="{% url 'zoekApp:bestellingen' %}">
+                            {% csrf_token %}
+                            <button name= "voltooi-{{value}}" class="w3-button w3-green w3-margin w3-round-large" type="submit">Voltooi</button>
+                            <button name= "probleem-{{value}}" class="w3-button w3-red w3-margin w3-round-large">Probleem</button>
+                            <button name= "behandeling-{{value}}" class="w3-button w3-orange w3-margin w3-round-large">Neem in behandeling</button>
+                        </form>
+                        <h3><b>{{key}} : {{value}}</b></h3>
                     </div>
                 {% elif key == "producten" %}
                     {% for product in value %}
