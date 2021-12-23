@@ -41,7 +41,7 @@ def zoek_best_alles(dict):
 
 
 def update_state_best(num, state):
-    bests.update_one({'bestelnr': num}, {'$set': {'state': state}}, upsert=False)
+    bests.update_one({'bestelnr': int(num)}, {'$set': {'state': state}}, upsert=False)
 
 
 def update_state_prod(prod, state):
