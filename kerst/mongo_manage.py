@@ -48,9 +48,9 @@ def update_state_prod(prod, state):
     prods.update_one({'product': prod}, {'$set': {'state': state}}, upsert=False)
 
 
-def zoek_best(dict):
+def zoek_best(dict1):
     new_dict = {}
-    for key, value in dict.items():
+    for key, value in dict1.items():
         if value == '' or value is None:
             continue
         elif key == 'bestelnr':
@@ -59,7 +59,11 @@ def zoek_best(dict):
             new_dict['dagophalen'] = str(value)
         else:
             new_dict.update({key: value})
-    return bests.count_documents(new_dict), bests.find(new_dict)
+    if len(new_dict) == 1 and "naam" in new_dict:
+        return bests.count_documents({"naam": {"$regex": dict1['naam']}}), bests.find(
+            {"naam": {"$regex": dict1['naam']}})
+    else:
+        return bests.count_documents(new_dict), bests.find(new_dict)
 
 
 def cat_toevoegen():
