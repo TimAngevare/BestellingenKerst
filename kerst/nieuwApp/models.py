@@ -1,8 +1,6 @@
 # from django.db import models
 
-from mongo_manage import kerst_db
-bests = kerst_db['bestellingen']
-prods = kerst_db['producten']
+from mongo_manage import insert_best, insert_prod
 
 
 class Product:
@@ -12,7 +10,7 @@ class Product:
         self.snijdvlees = snijdvlees
 
     def insert(self):
-        prods.insert_one({"product": self.product, "cat": self.cat, "snijdvlees": self.snijdvlees, "state": "niet_gestart"})
+        insert_prod(self.product, self.cat, self.snijdvlees)
 
 
 class Snijdvlees:
@@ -39,16 +37,7 @@ class Snijdvlees:
             detail_key = 'snijden_detail.' + str(key) + '.' + str(bestelnr)
             incs[detail_key] = value
 
-        if self.bijz:
-            new_doc['bijz'] = self.bijz
-            prods.update_one({'product': self.product},
-                             {'$inc': incs,
-                              '$push': {'bijz': {str(bestelnr): self.bijz}}},
-                             upsert=True)
-        else:
-            prods.update_one({'product': self.product}, {'$inc': incs}, upsert=True)
-
-        bests.update_one({'bestelnr': bestelnr}, {"$push": {"producten": new_doc}})
+        insert_best(bestelnr, new_doc, incs, self.bijz)
 
 
 class Menu:
@@ -73,8 +62,6 @@ class Menu:
         if self.bijz:
             new_doc['bijz'] = self.bijz
 
-        bests.update_one({'bestelnr': bestelnr}, {"$push": {"producten": new_doc}})
-
         incs = {'aantal': self.aantal}
 
         for key, value in self.voorgerecht.items():
@@ -88,16 +75,7 @@ class Menu:
         incs['dessert.dessert_buffet'] = self.aantal
         incs['menu_detail.dessert_buffet.' + str(bestelnr)] = self.aantal
 
-        if self.bijz:
-            prods.update_one({'product': self.product},
-                             {'$inc': incs,
-                              '$push': {'bijz': {str(bestelnr): self.bijz}}},
-                             upsert=True)
-        else:
-            prods.update_one({'product': self.product},
-                             {'$inc': incs,
-                              '$set': {'cat': 'menu'}},
-                             upsert=True)
+        insert_best(bestelnr, new_doc, incs, self.bijz)
 
 
 class Gourmet:
@@ -120,19 +98,7 @@ class Gourmet:
             incs['conf.' + prod_naam + '.' + ding] = gemar[ding]
             incs['conf_detail.' + prod_naam + '.' + ding + '.' + str(bestelnr)] = gemar[ding]
 
-        if self.bijz:
-            new_doc['bijz'] = self.bijz
-            prods.update_one({'product': self.product},
-                             {'$inc': incs,
-                              '$push': {'bijz': {str(bestelnr): self.bijz}}},
-                             upsert=True)
-        else:
-            prods.update_one({'product': self.product},
-                             {'$inc': incs,
-                              '$set': {'cat': 'zelf_gourmet'}},
-                             upsert=True)
-
-        bests.update_one({'bestelnr': bestelnr}, {"$push": {"producten": new_doc}})
+        insert_best(bestelnr, new_doc, incs, self.bijz)
 
 
 class DryAgedVlees:
@@ -153,19 +119,7 @@ class DryAgedVlees:
 
         incs = {self.soort: int(self.gewicht), self.soort + '_detail.' + str(bestelnr): int(self.gewicht)}
 
-        if self.bijz:
-            new_doc['bijz'] = self.bijz
-            prods.update_one({'product': self.product},
-                             {'$inc': incs,
-                              '$push': {'bijz': {str(bestelnr): self.bijz}}},
-                             upsert=True)
-        else:
-            prods.update_one({'product': self.product},
-                             {'$inc': incs,
-                              '$set': {'cat': 'dry_aged'}},
-                             upsert=True)
-
-        bests.update_one({'bestelnr': bestelnr}, {"$push": {"producten": new_doc}})
+        insert_best(bestelnr, new_doc, incs, self.bijz)
 
 
 class Standaard:
@@ -183,14 +137,7 @@ class Standaard:
 
         incs = {'aantal': self.aantal, 'detail.' + str(bestelnr): self.aantal}
 
-        if self.bijz:
-            new_doc['bijz'] = self.bijz
-            prods.update_one({'product': self.product}, {'$inc': incs, '$push': {'bijz': {str(bestelnr): self.bijz}}},
-                             upsert=True)
-        else:
-            prods.update_one({'product': self.product}, {'$inc': incs}, upsert=True)
-
-        bests.update_one({'bestelnr': bestelnr}, {"$push": {"producten": new_doc}})
+        insert_best(bestelnr, new_doc, incs, self.bijz)
 
 
 class Rollade:
@@ -217,11 +164,4 @@ class Rollade:
             incs['gekruid.nee'] = self.gewicht
             incs['gekruid_detail.nee.' + str(bestelnr)] = self.gewicht
 
-        if self.bijz:
-            new_doc['bijz'] = self.bijz
-            prods.update_one({'product': self.product}, {'$inc': incs, '$push': {'bijz': {str(bestelnr): self.bijz}}},
-                             upsert=True)
-        else:
-            prods.update_one({'product': self.product}, {'$inc': incs}, upsert=True)
-
-        bests.update_one({'bestelnr': bestelnr}, {"$push": {"producten": new_doc}})
+        insert_best(bestelnr, new_doc, incs, self.bijz)

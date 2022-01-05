@@ -1,14 +1,20 @@
 <!DOCTYPE html>
 <html lang="nl">
+    {% load static %}
     <head>
         <meta charset="utf-8">
         <meta name="author" content="Tim Angevare, Jelle van den Brink">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="theme-color" content="#aeaeae">
         <title>{% block title %}Bestellingen Slager 2021{% endblock %}</title>
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
         <link rel="preconnect" href="https://fonts.googleapis.com"> 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+        <link rel="manifest" href="{% static 'site.webmanifest' %}">
         <style>
             * {
                 font-family: 'Roboto', sans-serif;
@@ -23,7 +29,7 @@
     </head>
     <body>
         <header class="w3-display-container w3-gray" style="height: 120px; display: block;">
-            <div class="w3-display-left"><a href="/"><img src="https://midmid.blob.core.windows.net/images/de-ambachtelijke-dorpsslagerij/logo/de-ambachtelijke-dorpsslagerij_16a495_md.jpg?v=d96a1867dd9b649db01551f10b456227" alt="Dorpsslagerij logo"></a></div>
+            <div class="w3-display-left"><a href="/"><img src="{% static 'dorpsslagerijlogofull.png' %}" alt="Dorpsslagerij logo"></a></div>
             <div class="w3-display-middle"><h1>Kerstbestellingen 2021</h1></div>
             {% if mainpage %}
                 <div class="w3-display-right w3-margin">

@@ -8,28 +8,9 @@ import datetime
 from .models import *
 from .forms import *
 
-from mongo_manage import kerst_db
-bests = kerst_db['bestellingen']
-prods = kerst_db['producten']
+from mongo_manage import get_datalists
 
-alle_prodlist = []
-standaard_prodlist = []
-snijdvlees_prodlist = []
-cat_list = ["overig"]
-
-obj_prods = prods.find({}, {'product': 1, 'snijdvlees': 1, 'cat': 1})
-for obj_prod in obj_prods:
-    alle_prodlist.append(obj_prod['product'])
-    if obj_prod['cat'] not in cat_list:
-        cat_list.append(obj_prod['cat'])
-
-    if obj_prod['cat'] in ['dry_aged', 'menu', 'zelf_gourmet', 'rollade']:
-        continue
-
-    if obj_prod['snijdvlees']:
-        snijdvlees_prodlist.append(obj_prod['product'])
-    else:
-        standaard_prodlist.append(obj_prod['product'])
+alle_prodlist, standaard_prodlist, snijdvlees_prodlist, cat_list = get_datalists()
 
 
 def index(request):
