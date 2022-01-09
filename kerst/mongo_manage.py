@@ -1,6 +1,7 @@
+import os
 from utils import get_db
 
-kerst_db = get_db('kerst_db')
+kerst_db = get_db(os.environ['MONGODB'])
 prods = kerst_db['producten']
 bests = kerst_db['bestellingen']
 
