@@ -1,20 +1,12 @@
+import os
+import datetime
 from utils import get_db
 
-kerst_db = get_db('kerst_db')
+kerst_db = get_db(os.environ['MONGO_DB'])
 prods = kerst_db['producten']
 bests = kerst_db['bestellingen']
 
-
-def verwijder_best_tui():
-    bestelnr = int(input('\nBestelnummer van de bestelling die je wil verwijderen -'))
-    delete_result = bests.delete_one({'bestelnr': bestelnr})
-    if delete_result.acknowledged:
-        if delete_result.deleted_count == 1:
-            print("Gelukt!")
-        else:
-            print("Er zijn " + delete_result.deleted_count + " documenten verwijderd uit bestellingen.")
-    else:
-        print("Het gaat helemaal mis, het is niet gelukt.")
+# ------- GLOBAAL GEBRUIKTE FUNCTIES -----------------------------------------------------------------------------------
 
 
 def verwijder_best(bestelnr):
@@ -24,6 +16,31 @@ def verwijder_best(bestelnr):
             raise RuntimeError("Verwijderen gelukt, maar er is niet 1 bestelling verwijderd maar " + delete_result.deleted_count)
     else:
         raise RuntimeError("Het verwijderen van de bestelling is niet gelukt: unacknowledged")
+
+
+def get_huidige_producten(bestelnr):
+    producten = bests.find_one({'bestelnr': int(bestelnr)}, {'producten': 1})
+    return_string = ""
+    if len(producten['producten']) > 0:
+        for product in producten['producten']:
+            try:
+                return_string += product['product'] + " (x" + str(product['aantal']) + "), "
+            except KeyError:
+                try:
+                    return_string += product['product'] + " (" + str(product['gewicht']) + " gr.), "
+                except KeyError:
+                    prod = product['product']
+                    if prod == 'zelf_gourmet':
+                        prod = 'gourmet eigen conf.'
+
+                    return_string += prod + ", "
+    else:
+        return_string = "Nog geen producten toegevoegd"
+
+    if return_string[-2:] == ", ":
+        return return_string[:-2]
+
+    return return_string
 
 
 def zoek_prod(dict):
@@ -116,6 +133,166 @@ def get_datalists():
     return alle_prodlist, standaard_prodlist, snijdvlees_prodlist, cat_list
 
 
+def find(db, match_filter, show_filters):
+    show_filter = {}
+    for filt in show_filters:
+        show_filter[filt] = 1
+
+    if db == 'bestellingen':
+        return bests.find(match_filter, show_filter)
+    elif db == 'producten':
+        return prods.find(match_filter, show_filter)
+    else:
+        raise ValueError("Dat type database is niet bekend binnen het systeem")
+
+
+def verwijder(bestelnr):
+    find_result = find('bestellingen', {'bestelnr': bestelnr}, ['producten'])
+
+    if not find_result:
+        return False
+
+    producten_array = find_result['producten']
+
+    # Eerst alle producten verwijderen
+    for product in producten_array:
+        prod_naam = product['product']
+        inc_doc = {}
+
+        cat = find('producten', {'product': prod_naam}, [])['cat']
+
+        if cat == 'zelf_gourmet':
+            for prod, doc in product['conf'].items():
+                ding = next(iter(doc))
+                inc_doc['conf.' + prod + '.' + ding] = int(doc[ding]) * -1
+                inc_doc['conf_detail.' + prod + '.' + ding + '.' + str(bestelnr)] = int(doc[ding]) * -1
+
+        elif cat == 'dry_aged':
+            inc_doc[product['soort']] = int(product['gewicht']) * -1
+
+            # Huidige implementatie
+            inc_doc[product['soort'] + '_detail.' + str(bestelnr)] = int(product['gewicht']) * -1
+
+            # Implementatie voor snijden bij dry_aged
+            # snijden = product['snijden']
+            # for gewicht, aantal in snijden.items():
+            #     inc_doc['snijden.' + gewicht] = int(aantal) * -1
+            #     inc_doc[product['soort'] + '_detail.' + gewicht + '.' + str(bestelnr)] = int(aantal) * -1
+
+        elif cat == 'menu':
+            aantal = int(product['aantal'])
+            inc_doc['aantal'] = aantal * -1
+
+            for gerecht, nummer in product['voorgerecht'].items():
+                inc_doc['voorgerecht.' + gerecht] = int(nummer) * -1
+                inc_doc['menu_detail.' + gerecht + '.' + str(bestelnr)] = int(nummer) * -1
+
+            inc_doc['hoofdgerecht.beef_wellington'] = aantal * -1
+            inc_doc['menu_detail.beef_wellington.' + str(bestelnr)] = aantal * -1
+
+            inc_doc['dessert.dessert_buffet'] = aantal * -1
+            inc_doc['menu_detail.dessert_buffet.' + str(bestelnr)] = aantal * -1
+
+        elif cat == 'rollade':
+            int_gewicht_neg = int(product['gewicht']) * -1
+            inc_doc['gewicht'] = int_gewicht_neg
+
+            if product['gekruid']:
+                inc_doc['gekruid.ja'] = int_gewicht_neg
+                inc_doc['gekruid_detail.ja.' + str(bestelnr)] = int_gewicht_neg
+            else:
+                inc_doc['gekruid.nee'] = int_gewicht_neg
+                inc_doc['gekruid_detail.nee.' + str(bestelnr)] = int_gewicht_neg
+
+        else:
+            try:
+                snijden = product['snijden']
+                inc_doc['gewicht'] = int(product['gewicht']) * -1
+                for gewicht, aantal in snijden.items():
+                    inc_doc['snijden.' + gewicht] = int(aantal) * -1
+                    inc_doc['snijden_detail.' + gewicht + '.' + str(bestelnr)] = int(aantal) * -1
+
+            except KeyError:
+                inc_doc['aantal'] = int(product['aantal']) * -1
+                inc_doc['detail.' + str(bestelnr)] = int(product['aantal']) * -1
+
+        # In 1 keer checken of dat er een bijzonderheid is
+        try:
+            bijz = product['bijz']
+
+            verw_result = prods.update_one({'product': prod_naam}, {'$inc': inc_doc,
+                                                               '$pull': {'bijz': {str(bestelnr): bijz}}})
+        except KeyError:
+            verw_result = prods.update_one({'product': prod_naam}, {'$inc': inc_doc})
+
+
+    # Nog even de bestelling zelf verwijderen en dan klaar!
+    bests.delete_one({'bestelnr': bestelnr})
+    return True
+
+
+def maak_nieuwe_bestelling(email, dag_ophalen, medewerker):
+    obj_bestelnrs = find('bestellingen', {}, ['bestelnr'])
+    list_bestelnrs = []
+    for obj_bnr in obj_bestelnrs:
+        list_bestelnrs.append(obj_bnr['bestelnr'])
+
+    hoogst_huidig = 0
+
+    for bnr in list_bestelnrs:
+        string_bnr = str(bnr)
+        if string_bnr[:2] == dag_ophalen:
+            int_bnr = int(string_bnr[2:])
+            if int_bnr > hoogst_huidig:
+                hoogst_huidig = int_bnr
+
+    nieuw_nr = hoogst_huidig + 1
+    str_nieuw_nr = str(nieuw_nr)
+    while len(str_nieuw_nr) < 3:
+        str_nieuw_nr = '0' + str_nieuw_nr
+
+    str_nieuw_bestelnr = dag_ophalen + str_nieuw_nr
+    nieuw_bestelnr = int(str_nieuw_bestelnr)
+
+    doc = {
+        "bestelnr": nieuw_bestelnr,
+        "email": email,
+        "state": "niet_gestart",
+        "medewerker": medewerker,
+        "producten": []
+    }
+    bests.insert_one(doc)
+
+
+def finish_bestelling(bestelnr, email, data):
+    bests.update_one({'bestelnr': int(bestelnr)}, {
+        "$set": {"email": email,
+                 "naam": data['naam'],
+                 "telnr": data['telnr'],
+                 "dagophalen": bestelnr[:2],
+                 "tijdophalen": int(data['tijdophalen']),
+                 "besteltijd": datetime.datetime.utcnow()
+                 }
+    })
+
+
+# ------- TUI ----------------------------------------------------------------------------------------------------------
+
+
+def verwijder_best_tui():
+    bestelnr = int(input('\nBestelnummer van de bestelling die je wil verwijderen -'))
+    delete_result = verwijder(bestelnr)
+
+    if bestelnr:
+        print('Gelukt!')
+    else:
+        print('Niet gelukt')
+
+
+def huidige_producten_tui():
+    return get_huidige_producten(int(input("Bestelnummer: ")))
+
+
 def cat_toevoegen_tui():
     obj_geen_cat = []
     for obj in prods.find({'cat': {'$exists': False}}):
@@ -145,21 +322,28 @@ def cat_toevoegen_tui():
             break
 
 
-# menu_opties = {
-#     '1': verwijder_best_tui,
-#     '2': cat_toevoegen_tui
-# }
-#
-# menu_text = """
-# 1: Verwijder bestelling
-# 2: Categorieen toevoegen
-#
-# 9: Stop"""
-#
-# while True:
-#     print(menu_text)
-#     keuze = input('Wat wil je doen? -')
-#     if keuze == '9':
-#         break
-#     else:
-#         menu_opties[keuze]()
+def main():
+    menu_opties = {
+        '1': verwijder_best_tui,
+        '2': cat_toevoegen_tui,
+        '3': huidige_producten_tui
+    }
+
+    menu_text = """
+    1: Verwijder bestelling
+    2: Categorieen toevoegen
+    3: Huidige producten bestelling
+    
+    9: Stop"""
+
+    while True:
+        print(menu_text)
+        keuze = input('Wat wil je doen? -')
+        if keuze == '9':
+            break
+        else:
+            menu_opties[keuze]()
+
+
+# if __name__ == "main":
+#     main()
