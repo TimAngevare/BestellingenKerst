@@ -1,6 +1,7 @@
+import datetime
 from utils import get_db
 
-kerst_db = get_db(os.environ['MONGO_DB'])
+kerst_db = get_db('kerst_db')
 prods = kerst_db['producten']
 bests = kerst_db['bestellingen']
 
