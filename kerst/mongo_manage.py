@@ -1,5 +1,3 @@
-import os
-import datetime
 from utils import get_db
 
 kerst_db = get_db(os.environ['MONGO_DB'])
